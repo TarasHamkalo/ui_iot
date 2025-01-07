@@ -1,12 +1,27 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {MqttIrService} from "./services/mqtt-ir.service";
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: false,
+  // styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+
   title = 'ui_iot';
+
+  constructor(private mqttIrService: MqttIrService) {
+  }
+
+  ngOnInit(): void {
+    console.log('ngOnInit');
+    this.mqttIrService.createConnection();
+  }
+
+  sendMessage(): void {
+    this.mqttIrService.publish('kpi/hyperion/th776no', 'Hello, MQTT!');
+  }
+
 }
