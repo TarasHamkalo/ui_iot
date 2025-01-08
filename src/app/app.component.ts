@@ -4,8 +4,28 @@ import {MqttWrapperService} from "./services/mqtt-wrapper.service";
 
 @Component({
   selector: "app-root",
-  templateUrl: "./app.component.html",
-  
+  standalone: false,
+  template: `
+    <div class="app-layout">
+      <app-header (menuToggle)="home.toggleSideNav()"/>
+      <main class="content">
+        <app-home #home/>
+      </main>
+    </div>
+  `,
+
+  styles: `
+    .app-layout {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding-top: 64px;
+    }
+  `
 })
 export class AppComponent implements OnDestroy {
 

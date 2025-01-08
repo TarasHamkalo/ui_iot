@@ -1,0 +1,12 @@
+<mat-sidenav-container class="home" autosize="true">
+  <mat-sidenav class="sidenav-colored"
+               [(opened)]="isSidenavOpen"
+               mode="push">
+
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

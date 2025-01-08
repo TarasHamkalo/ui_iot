@@ -1,0 +1,17 @@
+<div class="titled-surface">
+
+  <div class="text-frame"
+       [class.title-centered]="isTitleCentered">
+
+    <h1 class="title-text">{{ title }}</h1>
+    <p class="subtitle-text">{{ subtitle }}</p>
+  </div>
+
+  <div class="content"
+    [class.horizontal]="isHorizontal">
+
+    <ng-content></ng-content>
+
+  </div>
+
+</div>
