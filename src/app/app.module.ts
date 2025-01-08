@@ -1,40 +1,32 @@
-import {NgModule} from '@angular/core';
+import {NgModule} from "@angular/core";
 import {AppComponent} from "./app.component";
 import {BrowserModule} from "@angular/platform-browser";
 import {MatButton} from "@angular/material/button";
-import {MqttIrService} from "./services/mqtt-ir.service";
 import {IMqttServiceOptions, MqttModule} from "ngx-mqtt";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MqttWrapperService} from "./services/mqtt-wrapper.service";
+
 
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: '147.232.205.176',
-  port: 8000,
-  // port: 8088,
-  // path: '/ws',
-  protocol: 'ws',
+  hostname: import.meta.env.NG_APP_MQTT_HOSTNAME,
+  port: import.meta.env.NG_APP_MQTT_PORT,
+  protocol: import.meta.env.NG_APP_MQTT_PROTOCOL == "wss" ? "wss" : "ws",
 
-  clientId: 'th776no',
-  username: 'maker',
-  password: 'mother.mqtt.password',
+  username: import.meta.env.NG_APP_MQTT_USERNAME,
+  password: import.meta.env.NG_APP_MQTT_PASSWORD,
 };
-
-// const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-//   hostname: '127.0.0.1',
-//   port: 8000,
-//   path: '/', // Default path as Mosquitto is not configured for a custom path
-//   protocol: 'ws', // WebSocket protocol
-//   clientId: 'th776no', // Unique client ID
-// };
 
 @NgModule({
   declarations: [
-    AppComponent, // Declare your AppComponent here
+    AppComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     MatButton,
-    MqttModule.forRoot(MQTT_SERVICE_OPTIONS), // Include MQTT configuration
+    MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
   ],
-  providers: [MqttIrService], // Add the service to providers
-  bootstrap: [AppComponent], // Set AppComponent as the bootstrap component
+  providers: [MqttWrapperService],
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

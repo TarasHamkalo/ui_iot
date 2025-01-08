@@ -1,27 +1,24 @@
-import {Component, OnInit} from '@angular/core';
-import {MqttIrService} from "./services/mqtt-ir.service";
+import {Component, OnDestroy} from "@angular/core";
+import {MqttWrapperService} from "./services/mqtt-wrapper.service";
 
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  standalone: false,
-  // styleUrl: './app.component.css'
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnDestroy {
 
-  title = 'ui_iot';
+  title = "ui_iot";
 
-  constructor(private mqttIrService: MqttIrService) {
-  }
-
-  ngOnInit(): void {
-    console.log('ngOnInit');
-    this.mqttIrService.createConnection();
-  }
+  constructor(private mqttWrapper: MqttWrapperService) {}
 
   sendMessage(): void {
-    this.mqttIrService.publish('kpi/hyperion/th776no', 'Hello, MQTT!');
+    this.mqttWrapper.publish("kpi/hyperion", "Hello, MQTT!");
+  }
+
+  ngOnDestroy() {
+    this.mqttWrapper.disconnect();
   }
 
 }
