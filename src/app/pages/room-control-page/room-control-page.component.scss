@@ -2,8 +2,9 @@
 
 mat-tab-group {
   @include mat.tabs-overrides((
-          container-height: 4rem
+          container-height: 64px,
   ));
+  background-color:  var(--mat-sys-surface-container);
 }
 
 .bottom-right-fab {
@@ -16,6 +17,7 @@ mat-tab-group {
   position: fixed;
   bottom: 0;
   width: 100vw;
+  z-index: 2;
 }
 
 .vertical-tab {
