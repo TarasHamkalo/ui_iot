@@ -1,50 +1,38 @@
-<!--<mat-tab-group headerPosition="below">-->
-<!--  <mat-tab>-->
-<!--    <ng-template mat-tab-label>-->
-<!--      <mat-icon class="example-tab-icon">thumb_up</mat-icon>-->
-<!--      First-->
-<!--    </ng-template>-->
-<!--    Content 1-->
-<!--  </mat-tab>-->
+<app-content-container>
+  @switch (tabs.selectedIndex) {
+    @case (0) {
+      <app-register-action/>
+    }
+  }
+</app-content-container>
 
-<!--  <mat-tab>-->
-<!--    <ng-template mat-tab-label>-->
-<!--      <mat-icon class="example-tab-icon">thumb_up</mat-icon>-->
-<!--      Second-->
-<!--    </ng-template>-->
-<!--    Content 2-->
-<!--  </mat-tab>-->
-
-<!--  <mat-tab>-->
-<!--    <ng-template mat-tab-label>-->
-<!--      <mat-icon class="example-tab-icon">thumb_up</mat-icon>-->
-<!--      Third-->
-<!--    </ng-template>-->
-
-<!--    Content 3-->
-<!--  </mat-tab>-->
-<!--</mat-tab-group>-->
-<mat-tab-group #tabs headerPosition="below" class="bottom-tabs">
+<mat-tab-group #tabs class="bottom-tabs" headerPosition="below">
   <mat-tab>
     <ng-template mat-tab-label>
-      <mat-icon>thumb_up</mat-icon>
-      First
+      <div class="vertical-tab">
+        <mat-icon aria-label="Remote control tab">sports_esports</mat-icon>
+        Control
+      </div>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label aria-label="Schedule actions">
+      <div class="vertical-tab">
+        <mat-icon>schedule</mat-icon>
+        Schedule
+      </div>
     </ng-template>
   </mat-tab>
   <mat-tab>
     <ng-template mat-tab-label>
-      <mat-icon>thumb_up</mat-icon>
-      Second
-    </ng-template>
-  </mat-tab>
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <mat-icon>thumb_up</mat-icon>
-      Third
+      <div class="vertical-tab">
+        <mat-icon aria-label="Register new action">app_registration</mat-icon>
+        Register
+      </div>
     </ng-template>
   </mat-tab>
 </mat-tab-group>
 
-<button class="bottom-right-fab" mat-fab aria-label="Icon to add new control">
-  <mat-icon>add</mat-icon>
-</button>
+<!--<button class="bottom-right-fab" mat-fab aria-label="Icon to add new control">-->
+<!--  <mat-icon>add</mat-icon>-->
+<!--</button>-->

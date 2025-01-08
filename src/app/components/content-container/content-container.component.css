@@ -1,0 +1,34 @@
+.content {
+  flex-grow: 1;
+  padding-top: calc(64px + 12px);
+  height: 100%;
+  /*width: 100%;*/
+}
+
+@media (max-width: 1200px) {
+  .content {
+    padding-left: 8rem;
+    padding-right: 8rem;
+  }
+}
+
+@media (max-width: 840px) {
+  .content {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
