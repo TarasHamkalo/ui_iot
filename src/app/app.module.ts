@@ -11,6 +11,10 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {LayoutComponent} from "./layout/layout.component";
 import {MqttActionsService} from "./services/mqtt-actions.service";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {MqttIrRecorderService} from "./services/mqtt-ir-recorder.service";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatInputModule} from "@angular/material/input";
+import {MatDialogModule} from "@angular/material/dialog";
 
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: import.meta.env.NG_APP_MQTT_HOSTNAME,
@@ -35,9 +39,17 @@ const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     ReactiveFormsModule,
     MatButtonModule,
     LayoutComponent,
-    FormsModule
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule
   ],
-  providers: [MqttActionsService, MqttWrapperService],
+  providers: [
+    MqttActionsService,
+    MqttWrapperService,
+    MqttIrRecorderService
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -5,15 +5,17 @@ import {Observable} from "rxjs";
 @Injectable()
 export class MqttWrapperService {
 
+  // e.g. room topic
+  private readonly baseTopic: string = import.meta.env.NG_APP_MQTT_BASE_TOPIC;
+
   constructor(private mqttService: MqttService) { }
 
   public publish(topic: string, message: string): void {
-    const specificTopic = topic + "/" + this.mqttService.clientId;
-    this.mqttService.unsafePublish(specificTopic, message, {qos: 1, retain: true});
+    this.mqttService.unsafePublish(`${this.baseTopic}/${topic}`, message, {qos: 1, retain: true});
   }
 
   public topic(topic: string): Observable<IMqttMessage> {
-    return this.mqttService.observe(topic);
+    return this.mqttService.observe(`${this.baseTopic}/${topic}`);
   }
 
   public disconnect(): void {

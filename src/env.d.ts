@@ -9,6 +9,8 @@ declare interface Env {
   readonly NG_APP_MQTT_USERNAME: string;
   readonly NG_APP_MQTT_PASSWORD: string;
 
+  readonly NG_APP_MQTT_BASE_TOPIC: string;
+
 }
 
 declare interface ImportMeta {
