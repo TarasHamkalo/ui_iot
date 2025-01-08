@@ -3,6 +3,8 @@
   padding-top: calc(64px + 12px);
   height: 100%;
   /*width: 100%;*/
+  padding-left: 12rem;
+  padding-right: 12rem;
 }
 
 @media (max-width: 1200px) {

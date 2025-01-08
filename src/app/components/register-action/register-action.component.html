@@ -1,30 +1,47 @@
 <app-surface title="Register action" subtitle="Register shortcut for sending mqtt request">
-  <form (ngSubmit)="onSubmit(formDirective)" [formGroup]="actionRegistrationForm" #formDirective="ngForm">
+  <form (ngSubmit)="onSubmit(formDirective)" [formGroup]="actionRegistrationForm"
+        #formDirective="ngForm">
     <mat-card-content>
+      <div class="field-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Action name</mat-label>
+          <input #nameInput matInput formControlName="actionName"/>
+          <mat-hint align="start">{{ nameInput.value.length }}/150</mat-hint>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Action name</mat-label>
-        <input #nameInput matInput formControlName="actionName">
-        <mat-hint align="start">{{ nameInput.value.length}}/150</mat-hint>
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Topic</mat-label>
+          <input #topicInput matInput formControlName="mqttTopic"/>
+          <mat-hint align="start">{{ topicInput.value.length }}/150</mat-hint>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Topic</mat-label>
-        <input #topicInput matInput formControlName="mqttTopic">
-        <mat-hint align="start">{{ topicInput.value.length}}/150</mat-hint>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Payload</mat-label>
-        <textarea #payloadInput matInput formControlName="mqttPayload"></textarea>
-        <mat-hint align="start">{{ payloadInput.value.length}}/650</mat-hint>
-      </mat-form-field>
+        <mat-checkbox formControlName="mqttRetain">Retain message</mat-checkbox>
+      </div>
 
-      <mat-checkbox formControlName="mqttRetain">Retain message</mat-checkbox>
+      <mat-tab-group>
+        <mat-tab label="Payload">
+          <div class="tab-content-wrapper">
+            <mat-form-field style="width: 100%;" appearance="outline">
+              <mat-label>Payload</mat-label>
+              <textarea #payloadInput matInput formControlName="mqttPayload"></textarea>
+              <mat-hint align="start">JSON string</mat-hint>
+              <mat-hint align="end">{{ payloadInput.value.length }}/650</mat-hint>
+            </mat-form-field>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="IR Payload">
+          <div class="tab-content-wrapper">
+            <div class="payload-field-container">
+              <button mat-flat-button (click)="recordIrPayload()">Record IR payload</button>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
 
     </mat-card-content>
     <mat-card-actions>
-
-      <button mat-stroked-button (click)="clearForm(formDirective)">
+      <button mat-stroked-button type="button" (click)="clearForm(formDirective)">
         Clear form
       </button>
 
@@ -33,5 +50,4 @@
       </button>
     </mat-card-actions>
   </form>
-
 </app-surface>
