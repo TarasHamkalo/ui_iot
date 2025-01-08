@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { MqttActionsService } from './mqtt-actions.service';
+import { MqttActionsService } from "./mqtt-actions.service";
 
-describe('MqttActionsService', () => {
+describe("MqttActionsService", () => {
   let service: MqttActionsService;
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('MqttActionsService', () => {
     service = TestBed.inject(MqttActionsService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 });

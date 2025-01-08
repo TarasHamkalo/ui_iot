@@ -5,7 +5,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {IMqttServiceOptions, MqttModule} from "ngx-mqtt";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MqttWrapperService} from "./services/mqtt-wrapper.service";
-import {AppRoutingModule} from './app-routing.module';
+import {AppRoutingModule} from "./app-routing.module";
 import {MatIconModule} from "@angular/material/icon";
 import {MatTabsModule} from "@angular/material/tabs";
 import {LayoutComponent} from "./layout/layout.component";

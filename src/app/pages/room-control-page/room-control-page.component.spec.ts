@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { RoomControlPageComponent } from './room-control-page.component';
+import { RoomControlPageComponent } from "./room-control-page.component";
 
-describe('RoomControlComponent', () => {
+describe("RoomControlComponent", () => {
   let component: RoomControlPageComponent;
   let fixture: ComponentFixture<RoomControlPageComponent>;
 
@@ -17,7 +17,7 @@ describe('RoomControlComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

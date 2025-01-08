@@ -1,8 +1,7 @@
 <app-surface title="Register action" subtitle="Register shortcut for sending mqtt request">
-  <form (ngSubmit)="onSubmit(formDirective)" [formGroup]="actionRegistrationForm"
-        #formDirective="ngForm">
-    <mat-card-content>
-      <div class="field-group">
+  @if (this.step === "info") {
+    <form [formGroup]="basicActionInfoFormGroup">
+      <mat-card-content>
         <mat-form-field appearance="outline">
           <mat-label>Action name</mat-label>
           <input #nameInput matInput formControlName="actionName"/>
@@ -16,38 +15,50 @@
         </mat-form-field>
 
         <mat-checkbox formControlName="mqttRetain">Retain message</mat-checkbox>
-      </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-flat-button (click)="onProceed()" [disabled]="basicActionInfoFormGroup.invalid">
+          Proceed
+        </button>
+      </mat-card-actions>
+    </form>
+  } @else {
+    <mat-tab-group>
+      <mat-tab label="Payload">
+        <div class="tab-content-wrapper">
+          <mat-form-field style="width: 100%;" appearance="outline">
+            <mat-label>Payload</mat-label>
+            <textarea #payloadInput matInput [formControl]="payloadFormControl"></textarea>
+            <mat-hint align="start">JSON string</mat-hint>
+            <mat-hint align="end">{{ payloadInput.value.length }}/650</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-tab>
 
-      <mat-tab-group>
-        <mat-tab label="Payload">
-          <div class="tab-content-wrapper">
-            <mat-form-field style="width: 100%;" appearance="outline">
-              <mat-label>Payload</mat-label>
-              <textarea #payloadInput matInput formControlName="mqttPayload"></textarea>
-              <mat-hint align="start">JSON string</mat-hint>
-              <mat-hint align="end">{{ payloadInput.value.length }}/650</mat-hint>
+      <mat-tab label="IR Payload">
+        <div class="tab-content-wrapper">
+          <div class="device-field">
+            <mat-form-field appearance="outline">
+              <mat-label>IR device id</mat-label>
+              <input matInput>
+              <mat-hint align="start">E.g. /topic/deviceid/</mat-hint>
             </mat-form-field>
-          </div>
-        </mat-tab>
 
-        <mat-tab label="IR Payload">
-          <div class="tab-content-wrapper">
-            <div class="payload-field-container">
-              <button mat-flat-button (click)="recordIrPayload()">Record IR payload</button>
-            </div>
+            <button mat-flat-button>
+              Connect
+            </button>
           </div>
-        </mat-tab>
-      </mat-tab-group>
-
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-stroked-button type="button" (click)="clearForm(formDirective)">
-        Clear form
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+    <div class="controls-pane">
+      <button mat-stroked-button>
+        Cancel
       </button>
-
-      <button mat-flat-button type="submit" [disabled]="actionRegistrationForm.invalid">
+      <button mat-flat-button>
         Register
       </button>
-    </mat-card-actions>
-  </form>
+    </div>
+  }
+
 </app-surface>

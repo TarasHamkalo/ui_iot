@@ -1,11 +1,11 @@
-import {Injectable, signal, WritableSignal} from '@angular/core';
+import {Injectable, signal, WritableSignal} from "@angular/core";
 import {MqttAction} from "../types/mqtt-action";
 
 @Injectable()
 export class MqttActionsService {
 
   private storedActions = signal<MqttAction[]>([]);
-  private idCounter = 0
+  private idCounter = 0;
 
   constructor() {
   }

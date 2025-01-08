@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { RegisterActionComponent } from "./register-action.component";
+import { RecordIrModal } from "./record-ir-modal.component";
 
-describe("RegisterActionComponent", () => {
-  let component: RegisterActionComponent;
-  let fixture: ComponentFixture<RegisterActionComponent>;
+describe("ViewAnalysisModalComponent", () => {
+  let component: RecordIrModal;
+  let fixture: ComponentFixture<RecordIrModal>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RegisterActionComponent]
+      imports: [RecordIrModal]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RegisterActionComponent);
+    fixture = TestBed.createComponent(RecordIrModal);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
