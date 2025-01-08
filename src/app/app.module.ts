@@ -9,6 +9,8 @@ import {AppRoutingModule} from './app-routing.module';
 import {MatIconModule} from "@angular/material/icon";
 import {MatTabsModule} from "@angular/material/tabs";
 import {LayoutComponent} from "./layout/layout.component";
+import {MqttActionsService} from "./services/mqtt-actions.service";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: import.meta.env.NG_APP_MQTT_HOSTNAME,
@@ -30,10 +32,12 @@ const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     AppRoutingModule,
     MatTabsModule,
     MatIconModule,
+    ReactiveFormsModule,
     MatButtonModule,
-    LayoutComponent
+    LayoutComponent,
+    FormsModule
   ],
-  providers: [MqttWrapperService],
+  providers: [MqttActionsService, MqttWrapperService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
