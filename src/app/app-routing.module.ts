@@ -1,13 +1,11 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from "@angular/router";
+import {RoomControlPageComponent} from "./pages/room-control-page/room-control-page.component";
 
-import {
-  RemoteControlPageComponent
-} from "./pages/remote-control-page/remote-control-page.component";
 
 export const routes: Routes = [
 
-  {path: "control", component: RemoteControlPageComponent},
+  {path: "control", component: RoomControlPageComponent},
   {path: "**", redirectTo: "control"}
 
 ];

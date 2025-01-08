@@ -7,9 +7,10 @@ import {MqttWrapperService} from "./services/mqtt-wrapper.service";
   standalone: false,
   template: `
     <div class="app-layout">
-      <app-header (menuToggle)="home.toggleSideNav()"/>
+      <app-header/>
       <main class="content">
-        <app-home #home/>
+<!--        <app-home #home/>-->
+        <router-outlet></router-outlet>
       </main>
     </div>
   `,

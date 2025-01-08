@@ -1,0 +1,50 @@
+<!--<mat-tab-group headerPosition="below">-->
+<!--  <mat-tab>-->
+<!--    <ng-template mat-tab-label>-->
+<!--      <mat-icon class="example-tab-icon">thumb_up</mat-icon>-->
+<!--      First-->
+<!--    </ng-template>-->
+<!--    Content 1-->
+<!--  </mat-tab>-->
+
+<!--  <mat-tab>-->
+<!--    <ng-template mat-tab-label>-->
+<!--      <mat-icon class="example-tab-icon">thumb_up</mat-icon>-->
+<!--      Second-->
+<!--    </ng-template>-->
+<!--    Content 2-->
+<!--  </mat-tab>-->
+
+<!--  <mat-tab>-->
+<!--    <ng-template mat-tab-label>-->
+<!--      <mat-icon class="example-tab-icon">thumb_up</mat-icon>-->
+<!--      Third-->
+<!--    </ng-template>-->
+
+<!--    Content 3-->
+<!--  </mat-tab>-->
+<!--</mat-tab-group>-->
+<mat-tab-group #tabs headerPosition="below" class="bottom-tabs">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>thumb_up</mat-icon>
+      First
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>thumb_up</mat-icon>
+      Second
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>thumb_up</mat-icon>
+      Third
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>
+
+<button class="bottom-right-fab" mat-fab aria-label="Icon to add new control">
+  <mat-icon>add</mat-icon>
+</button>

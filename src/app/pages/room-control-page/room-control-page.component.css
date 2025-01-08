@@ -3,3 +3,10 @@
   bottom: 1rem;
   right: 1rem;
 }
+
+.bottom-tabs {
+  position: fixed;
+  bottom: 0;
+
+  width: 100%;
+}
