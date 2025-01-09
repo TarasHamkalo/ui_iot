@@ -1,0 +1,14 @@
+{
+  "rooms": [
+    {
+      "id": 1,
+      "name": "Hyperion",
+      "baseMqttTopic": "kpi/hyperion"
+    },
+    {
+      "id": 2,
+      "name": "Kronos",
+      "baseMqttTopic": "kpi/kronos"
+    }
+  ]
+}
