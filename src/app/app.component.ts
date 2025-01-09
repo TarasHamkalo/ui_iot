@@ -1,22 +1,19 @@
-import {Component, OnDestroy} from "@angular/core";
-import {MqttWrapperService} from "./services/mqtt-wrapper.service";
-
+import {Component} from "@angular/core";
+import {LayoutComponent} from "./layout/layout.component";
 
 @Component({
   selector: "app-root",
-  standalone: false,
+  standalone: true,
   template: `
-      <app-layout></app-layout>
+    <app-layout></app-layout>
   `,
+  imports: [
+    LayoutComponent
+  ]
 })
-export class AppComponent implements OnDestroy {
+
+export class AppComponent {
 
   title = "ui_iot";
-
-  constructor(private mqttWrapper: MqttWrapperService) {}
-
-  ngOnDestroy() {
-    this.mqttWrapper.disconnect();
-  }
 
 }

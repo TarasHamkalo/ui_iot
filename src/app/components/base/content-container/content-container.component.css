@@ -1,48 +1,41 @@
-.home {
+.content {
+  display: flex;
+
   height: 100%;
-  overflow-y: hidden;
-}
 
-.sidenav-colored {
-  position: fixed;
-  top: 64px;
+  flex-direction: column;
+  flex-grow: 1;
 
-  height: calc(100% - 64px);
-
-  padding: 0.25rem;
-  border-radius: 0;
-  background-color: var(--mat-sys-surface-container);
-}
-
-mat-sidenav-content {
-  padding-top: 1rem;
+  padding-top: calc(64px + 12px);
   padding-left: 12rem;
   padding-right: 12rem;
+
+  gap: 2rem;
 }
 
 @media (max-width: 1200px) {
-  .mat-sidenav-content {
+  .content {
     padding-left: 8rem;
     padding-right: 8rem;
   }
 }
 
 @media (max-width: 840px) {
-  .mat-sidenav-content {
+  .content {
     padding-left: 6rem;
     padding-right: 6rem;
   }
 }
 
 @media (max-width: 640px) {
-  .mat-sidenav-content {
+  .content {
     padding-left: 4rem;
     padding-right: 4rem;
   }
 }
 
 @media (max-width: 440px) {
-  .mat-sidenav-content {
+  .content {
     padding-left: 1rem;
     padding-right: 1rem;
   }
