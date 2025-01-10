@@ -6,6 +6,9 @@ import {
 } from "../../components/base/content-container/content-container.component";
 import {RoomControlContextService} from "../../context/room-control-context.service";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
+import {
+  ActionRegistrationComponent
+} from "../../components/action-registration/action-registration.component";
 
 @Component({
   selector: "app-room-control-page",
@@ -13,6 +16,7 @@ import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
     MatIcon,
     MatTabsModule,
     ContentContainerComponent,
+    ActionRegistrationComponent,
   ],
   templateUrl: "./room-control-page.component.html",
   styleUrl: "./room-control-page.component.scss"

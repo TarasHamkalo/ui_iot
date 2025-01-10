@@ -17,10 +17,7 @@ import {
   MqttStatusBubbleComponent
 } from "../../components/mqtt-status-bubble/mqtt-status-bubble.component";
 import {PageRoutes} from "../../app.routes";
-import {Router, RouterLink} from "@angular/router";
-import {
-  ActionRegistrationComponent
-} from "../../components/action-registration/action-registration.component";
+import {Router} from "@angular/router";
 
 @Component({
   selector: "app-home-page",
@@ -35,10 +32,7 @@ import {
     MatButton,
     ReactiveFormsModule,
     MatInput,
-    MqttStatusBubbleComponent,
-    RouterLink,
-
-    ActionRegistrationComponent
+    MqttStatusBubbleComponent
   ],
   templateUrl: "./home-page.component.html",
   // styleUrl: "./home-page.component.css"

@@ -1,5 +1,9 @@
 <app-content-container>
-  <button (click)="send()">send request</button>
+  @switch (tabs.selectedIndex) {
+    @case (2) {
+      <app-action-registration/>
+    }
+  }
 </app-content-container>
 
 <mat-tab-group #tabs class="bottom-tabs" headerPosition="below">
