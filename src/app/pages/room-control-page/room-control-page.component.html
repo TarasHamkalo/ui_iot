@@ -1,3 +1,12 @@
+<mat-toolbar>
+  <button mat-icon-button
+          aria-label="Return to home page"
+          (click)="navigateHome()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span>{{this.roomControlContext.getControlledRoom()().name}}</span>
+</mat-toolbar>
+
 <app-content-container>
   @switch (tabs.selectedIndex) {
     @case (2) {
