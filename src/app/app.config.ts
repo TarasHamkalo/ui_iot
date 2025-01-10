@@ -5,7 +5,7 @@ import {provideRouter} from "@angular/router";
 import {routes} from "./app.routes";
 import {IMqttServiceOptions, MqttClientService, MqttServiceConfig} from "ngx-mqtt";
 
-const mqttServiceOptions: IMqttServiceOptions = {
+const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: import.meta.env.NG_APP_MQTT_HOSTNAME,
   port: import.meta.env.NG_APP_MQTT_PORT,
   protocol: import.meta.env.NG_APP_MQTT_PROTOCOL == "wss" ? "wss" : "ws",
@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     {
       provide: MqttServiceConfig,
-      useValue: mqttServiceOptions
+      useValue: MQTT_SERVICE_OPTIONS
     },
     {
       provide: MqttClientService,

@@ -1,0 +1,137 @@
+import {Component} from "@angular/core";
+import {MatStepper, MatStepperModule} from "@angular/material/stepper";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatButton} from "@angular/material/button";
+import {MatInput} from "@angular/material/input";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {MqttIrService} from "../../services/mqtt-ir.service";
+import {first, map, timeout} from "rxjs";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MatIcon} from "@angular/material/icon";
+import {IMqttMessage} from "ngx-mqtt";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatCheckbox} from "@angular/material/checkbox";
+import {MatList, MatListItem} from "@angular/material/list";
+import {MqttActionRepositoryService} from "../../repository/mqtt-action-repository.service";
+
+@Component({
+  selector: "app-action-registration",
+  imports: [
+    ReactiveFormsModule,
+    MatStepperModule,
+    // MatFormField,
+    // MatInput,
+    MatButton,
+    // MatHint,
+    MatFormFieldModule,
+    MatInput,
+    MatTabGroup,
+    MatTab,
+    MatProgressSpinner,
+    MatIcon,
+    MatTooltip,
+    MatCheckbox,
+    MatList,
+    MatListItem,
+  ],
+  templateUrl: "./action-registration.component.html",
+  styleUrl: "./action-registration.component.css"
+})
+export class ActionRegistrationComponent {
+
+  public readonly STATUS_CHANGE_TIMEOUT: number = 15_000;
+
+  public readonly DATA_READ_TIMEOUT: number = 3_000;
+
+  protected readonly basicInfoForm: FormGroup;
+
+  protected readonly payloadForm: FormGroup;
+
+  protected payloadTabIndex = 0;
+
+  protected deviceState: "connected" | "connecting" | "disconnected" = "disconnected";
+
+  constructor(private mqttIrService: MqttIrService,
+              private mqttActionRepository: MqttActionRepositoryService,
+              private formBuilder: FormBuilder) {
+    this.basicInfoForm = this.formBuilder.group({
+      actionName: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z ]*")]],
+      mqttTopic: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z/]*")]],
+      mqttRetain: [false],
+    });
+
+    this.payloadForm = this.formBuilder.group({
+      mqttPayload: ["", Validators.required],
+      irDeviceId: [""],
+    });
+  }
+
+  protected recordIrSignal() {
+    this.deviceState = "connecting";
+    this.mqttIrService.record(this.payloadForm.controls["irDeviceId"].value).pipe(
+      timeout({first: this.STATUS_CHANGE_TIMEOUT}),
+      first()
+    ).subscribe({
+      next: () => {
+        //TODO: assumed the only status change could appear is "online" -> "recording"
+        this.deviceState = "connected";
+        console.log("device is ready");
+      },
+      error: (e) => {
+        this.deviceState = "disconnected";
+        console.error(e);
+      }
+    });
+  }
+
+
+  protected captureIrSignal() {
+    this.mqttIrService.capture(this.payloadForm.controls["irDeviceId"].value).pipe(
+      timeout({first: this.DATA_READ_TIMEOUT}),
+      first(),
+      map((message: IMqttMessage) => {
+        const payload = JSON.parse(message.payload.toString());
+        if (Object.hasOwn(payload, "data")) {
+          return message;
+        }
+
+        throw new Error("Payload does not contain data field");
+      })
+    ).subscribe({
+      next: (message: IMqttMessage) => {
+        const payload = JSON.parse(message.payload.toString());
+        this.payloadForm.controls["mqttPayload"].setValue(message.payload.toString());
+        this.payloadTabIndex = 0;
+        console.log(payload);
+      },
+      error: (e) => {
+        console.error(e);
+      }
+    });
+  }
+
+  protected stopRecording() {
+    this.mqttIrService.stopRecording(this.payloadForm.controls["irDeviceId"].value);
+    this.deviceState = "disconnected";
+  }
+
+  protected registerAction() {
+    try {
+      const payload = JSON.parse(this.payloadForm.controls["mqttPayload"].value);
+
+      this.mqttActionRepository.add({
+        id: Date.now(),
+        displayName: this.basicInfoForm.controls["actionName"].value,
+        mqttTopic: this.basicInfoForm.controls["mqttTopic"].value,
+        mqttRetain: this.basicInfoForm.controls["mqttRetain"].value,
+        mqttPayload: JSON.stringify(payload)
+      }).subscribe({
+        next: console.log,
+        error: console.error
+      });
+    } catch {
+      console.error("Invalid json format");
+    }
+  }
+}

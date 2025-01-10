@@ -1,0 +1,12 @@
+form {
+  padding: 1rem;
+}
+
+mat-tab {
+  padding: 1rem;
+}
+
+.full-width {
+  width: 100%;
+  box-sizing: border-box;
+}
