@@ -16,6 +16,11 @@ import {RoomControlContextService} from "../../context/room-control-context.serv
 import {
   MqttStatusBubbleComponent
 } from "../../components/mqtt-status-bubble/mqtt-status-bubble.component";
+import {PageRoutes} from "../../app.routes";
+import {Router, RouterLink} from "@angular/router";
+import {
+  ActionRegistrationComponent
+} from "../../components/action-registration/action-registration.component";
 
 @Component({
   selector: "app-home-page",
@@ -30,7 +35,10 @@ import {
     MatButton,
     ReactiveFormsModule,
     MatInput,
-    MqttStatusBubbleComponent
+    MqttStatusBubbleComponent,
+    RouterLink,
+
+    ActionRegistrationComponent
   ],
   templateUrl: "./home-page.component.html",
   // styleUrl: "./home-page.component.css"
@@ -45,6 +53,7 @@ export class HomePageComponent implements OnInit {
 
   constructor(protected readonly roomControlContext: RoomControlContextService,
               private readonly roomRepository: RoomRepositoryService,
+              private readonly router: Router,
               private readonly formBuilder: FormBuilder) {
     this.roomRegistrationForm = this.formBuilder.group({
       name: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z ]*")]],
@@ -58,6 +67,7 @@ export class HomePageComponent implements OnInit {
 
   private loadRooms(): void {
     this.loading = true;
+    // TODO: this to popup
     this.roomRepository.getAll().subscribe({
       next: (rooms) => {
         this.rooms = rooms;
@@ -80,4 +90,7 @@ export class HomePageComponent implements OnInit {
     }
   }
 
+  public roomPicked() {
+    this.router.navigate([`/${PageRoutes.CONTROL}`]);
+  }
 }

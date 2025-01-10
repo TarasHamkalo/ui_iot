@@ -6,7 +6,7 @@ import {Room} from "../types/room";
 })
 export class RoomControlContextService {
 
-  public controlledRoom = signal<Partial<Room>>({});
+  private controlledRoom = signal<Partial<Room>>({});
 
   private roomSelected = signal<boolean>(false);
 
@@ -15,6 +15,10 @@ export class RoomControlContextService {
       this.roomSelected.set(true);
       this.controlledRoom.set(room);
     }
+  }
+
+  public getControlledRoom() {
+    return this.controlledRoom.asReadonly();
   }
 
   public deselectControlledRoom() {

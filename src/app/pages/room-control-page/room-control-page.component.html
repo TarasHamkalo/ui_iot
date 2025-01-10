@@ -1,0 +1,30 @@
+<app-content-container>
+  <button (click)="send()">send request</button>
+</app-content-container>
+
+<mat-tab-group #tabs class="bottom-tabs" headerPosition="below">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="vertical-tab">
+        <mat-icon aria-label="Remote control tab">sports_esports</mat-icon>
+        Control
+      </div>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label aria-label="Schedule actions">
+      <div class="vertical-tab">
+        <mat-icon>schedule</mat-icon>
+        Schedule
+      </div>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div class="vertical-tab">
+        <mat-icon aria-label="Register new action">app_registration</mat-icon>
+        Register
+      </div>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

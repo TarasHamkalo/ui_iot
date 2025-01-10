@@ -1,0 +1,33 @@
+@use '@angular/material' as mat;
+
+mat-tab-group {
+  @include mat.tabs-overrides((
+          container-height: 64px,
+  ));
+}
+
+.bottom-right-fab {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.bottom-tabs {
+  position: fixed;
+  bottom: 0;
+
+  z-index: 2;
+
+  width: 100vw;
+
+  background-color: var(--mat-sys-surface-container);
+}
+
+.vertical-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+  padding: 4px;
+}

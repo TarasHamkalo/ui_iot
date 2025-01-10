@@ -1,16 +1,23 @@
-import {Injectable, signal} from "@angular/core";
+import {Injectable, Signal, signal} from "@angular/core";
 import {IMqttMessage, MqttService} from "ngx-mqtt";
 import {Observable} from "rxjs";
+import {RoomControlContextService} from "../context/room-control-context.service";
+import {Room} from "../types/room";
 
 @Injectable({providedIn: "root"})
 export class MqttWrapperService {
 
   // e.g. room topic
-  public readonly baseTopic: string = import.meta.env.NG_APP_MQTT_BASE_TOPIC;
+  // public readonly baseTopic: string = this.roomControlContext.;
 
   public readonly isConnected = signal<boolean>(false);
 
-  constructor(private mqttService: MqttService) {}
+  private controlledRoom: Signal<Partial<Room>>;
+
+  constructor(private mqttService: MqttService,
+              private _roomControlContext: RoomControlContextService) {
+    this.controlledRoom = this._roomControlContext.getControlledRoom();
+  }
 
   public connect(): void {
     if (this.isConnected()) {
@@ -35,10 +42,21 @@ export class MqttWrapperService {
   }
 
   public publish(topic: string, message: string): void {
-    this.mqttService.unsafePublish(`${this.baseTopic}/${topic}`, message, {qos: 1, retain: true});
+    this.mqttService.unsafePublish(this.withBaseTopic(topic), message, {qos: 1, retain: true});
   }
 
   public topic(topic: string): Observable<IMqttMessage> {
-    return this.mqttService.observe(`${this.baseTopic}/${topic}`);
+    return this.mqttService.observe(this.withBaseTopic(topic));
+  }
+
+  public withBaseTopic(topic: string): string {
+    const baseTopic = "tmp";
+    // const baseTopic = this.controlledRoom().baseMqttTopic;
+
+    if (baseTopic !== undefined) {
+      return`${baseTopic}/${topic}`;
+    }
+
+    return topic;
   }
 }
