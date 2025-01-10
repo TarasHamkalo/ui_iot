@@ -1,0 +1,29 @@
+.mqtt-status-bubble {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  transition: background-color 0.3s;
+}
+
+.mqtt-status-bubble.connected {
+  background-color: var(--mat-sys-primary);
+}
+
+.mqtt-status-bubble.connected mat-icon {
+  color: var(--mat-sys-on-primary);
+}
+
+.mqtt-status-bubble.disconnected {
+  background-color: var(--mat-sys-error);
+}
+.mqtt-status-bubble.disconnected mat-icon {
+  color: var(--mat-sys-on-error);
+}

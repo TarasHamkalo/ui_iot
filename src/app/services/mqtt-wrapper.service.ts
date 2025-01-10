@@ -1,18 +1,9 @@
 import {Injectable, signal} from "@angular/core";
-import {IMqttMessage, IMqttServiceOptions, MqttService} from "ngx-mqtt";
+import {IMqttMessage, MqttService} from "ngx-mqtt";
 import {Observable} from "rxjs";
 
 @Injectable({providedIn: "root"})
 export class MqttWrapperService {
-
-  public readonly mqttServiceOptions: IMqttServiceOptions = {
-    hostname: import.meta.env.NG_APP_MQTT_HOSTNAME,
-    port: import.meta.env.NG_APP_MQTT_PORT,
-    protocol: import.meta.env.NG_APP_MQTT_PROTOCOL == "wss" ? "wss" : "ws",
-
-    username: import.meta.env.NG_APP_MQTT_USERNAME,
-    password: import.meta.env.NG_APP_MQTT_PASSWORD,
-  };
 
   // e.g. room topic
   public readonly baseTopic: string = import.meta.env.NG_APP_MQTT_BASE_TOPIC;
@@ -22,8 +13,12 @@ export class MqttWrapperService {
   constructor(private mqttService: MqttService) {}
 
   public connect(): void {
+    if (this.isConnected()) {
+      return;
+    }
+
     try {
-      this.mqttService.connect(this.mqttServiceOptions as IMqttServiceOptions);
+      this.mqttService.connect();
     } catch (error) {
       console.error(error);
       return;

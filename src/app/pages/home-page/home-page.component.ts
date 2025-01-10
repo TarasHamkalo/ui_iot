@@ -13,6 +13,9 @@ import {MatButton} from "@angular/material/button";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {RoomControlContextService} from "../../context/room-control-context.service";
+import {
+  MqttStatusBubbleComponent
+} from "../../components/mqtt-status-bubble/mqtt-status-bubble.component";
 
 @Component({
   selector: "app-home-page",
@@ -26,7 +29,8 @@ import {RoomControlContextService} from "../../context/room-control-context.serv
     MatProgressBar,
     MatButton,
     ReactiveFormsModule,
-    MatInput
+    MatInput,
+    MqttStatusBubbleComponent
   ],
   templateUrl: "./home-page.component.html",
   // styleUrl: "./home-page.component.css"

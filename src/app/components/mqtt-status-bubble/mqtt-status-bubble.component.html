@@ -1,0 +1,16 @@
+<div class="mqtt-status-bubble"
+     [class.connected]="this.mqttWrapper.isConnected()"
+     [class.disconnected]="!this.mqttWrapper.isConnected()">
+  @if (this.mqttWrapper.isConnected()) {
+    <mat-icon aria-label="Connection to MQTT broker established"
+              matTooltip="Connection to MQTT broker established">
+      check_circle</mat-icon>
+  } @else {
+    <button mat-icon-button
+            aria-label="Reconnect to MQTT broker"
+            matTooltip="Reconnect to MQTT broker"
+            (click)="this.reconnect()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  }
+</div>
