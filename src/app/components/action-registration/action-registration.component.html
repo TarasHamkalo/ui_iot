@@ -1,29 +1,36 @@
-<mat-stepper orientation="vertical" [linear]="true" #stepper>
+<mat-stepper orientation="vertical"
+             [linear]="true"
+             (selectionChange)="this.onStepChange($event)"
+             #stepper
+
+>
   <mat-step [stepControl]="this.basicInfoForm">
     <form [formGroup]="this.basicInfoForm">
       <ng-template matStepLabel>Fill out action metadata</ng-template>
-      <mat-form-field appearance="outline">
-        <mat-label>Display name</mat-label>
-        <input #nameInput matInput formControlName="actionName"/>
-        <mat-hint align="start">{{ nameInput.value.length }}/150</mat-hint>
-      </mat-form-field>
+      <div class="field-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Display name</mat-label>
+          <input #nameInput matInput formControlName="actionName"/>
+          <mat-hint align="start">{{ nameInput.value.length }}/150</mat-hint>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Topic</mat-label>
-        <input #topicInput matInput formControlName="mqttTopic"/>
-        <mat-hint align="start">{{ topicInput.value.length }}/150</mat-hint>
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Topic</mat-label>
+          <input #topicInput matInput formControlName="mqttTopic"/>
+          <mat-hint align="start">{{ topicInput.value.length }}/150</mat-hint>
+        </mat-form-field>
 
-      <mat-checkbox formControlName="mqttRetain">Retain message</mat-checkbox>
+        <mat-checkbox formControlName="mqttRetain">Retain message</mat-checkbox>
 
+      </div>
       <div>
         <button mat-button matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
   <mat-step [stepControl]="this.payloadForm">
-    <ng-template matStepLabel>Configure Payload</ng-template>
     <form [formGroup]="this.payloadForm">
+      <ng-template matStepLabel>Configure Payload</ng-template>
       <mat-tab-group [(selectedIndex)]="this.payloadTabIndex">
         <mat-tab label="JSON">
           <div class="flex-vertical">
@@ -40,12 +47,12 @@
             @switch (this.deviceState) {
               @case ("disconnected") {
                 <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>IR Device ID</mat-label>
-                  <input matInput formControlName="irDeviceId"/>
-                </mat-form-field>
 
+                  <mat-label>IR Device ID</mat-label>
+                  <input #irDeviceIdInput matInput formControlName="irDeviceId"/>
+                </mat-form-field>
                 <button mat-raised-button color="primary" (click)="recordIrSignal()"
-                        [disabled]="this.payloadForm.controls['irDeviceId']?.value.length === 0">
+                        [disabled]="irDeviceIdInput.value.length === 0">
                   Start recoding
                 </button>
               }
@@ -82,8 +89,8 @@
     <p>You are now done.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
-      <button mat-button (click)="registerAction()">Register</button>
+      <button mat-button (click)="resetStepper(stepper)">Reset</button>
+      <button mat-button (click)="registerAction(stepper)">Register</button>
     </div>
   </mat-step>
 </mat-stepper>

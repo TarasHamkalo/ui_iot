@@ -14,6 +14,8 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatList, MatListItem} from "@angular/material/list";
 import {MqttActionRepositoryService} from "../../repository/mqtt-action-repository.service";
+import {NgSwitch, NgSwitchCase} from "@angular/common";
+import {StepperSelectionEvent} from "@angular/cdk/stepper";
 
 @Component({
   selector: "app-action-registration",
@@ -34,6 +36,8 @@ import {MqttActionRepositoryService} from "../../repository/mqtt-action-reposito
     MatCheckbox,
     MatList,
     MatListItem,
+    NgSwitch,
+    NgSwitchCase,
   ],
   templateUrl: "./action-registration.component.html",
   styleUrl: "./action-registration.component.css"
@@ -112,11 +116,13 @@ export class ActionRegistrationComponent {
   }
 
   protected stopRecording() {
-    this.mqttIrService.stopRecording(this.payloadForm.controls["irDeviceId"].value);
+    if (this.deviceState == "connected") {
+      this.mqttIrService.stopRecording(this.payloadForm.controls["irDeviceId"].value);
+    }
     this.deviceState = "disconnected";
   }
 
-  protected registerAction() {
+  protected registerAction(stepper: MatStepper) {
     try {
       const payload = JSON.parse(this.payloadForm.controls["mqttPayload"].value);
 
@@ -130,8 +136,22 @@ export class ActionRegistrationComponent {
         next: console.log,
         error: console.error
       });
+      this.resetStepper(stepper);
     } catch {
       console.error("Invalid json format");
     }
   }
+
+  protected onStepChange(event: StepperSelectionEvent) {
+    console.log(event);
+    if (event.selectedIndex == 1) {
+      this.stopRecording();
+    }
+  }
+
+  protected resetStepper(stepper: MatStepper) {
+    this.stopRecording();
+    stepper.reset();
+  }
+
 }

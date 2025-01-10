@@ -10,3 +10,18 @@ mat-tab {
   width: 100%;
   box-sizing: border-box;
 }
+
+.hide {
+  display: none;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+mat-stepper {
+  padding: 1rem;
+  border-radius: var(--mat-sys-corner-extra-large);
+}
