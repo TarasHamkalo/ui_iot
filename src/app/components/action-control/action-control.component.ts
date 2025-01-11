@@ -1,4 +1,13 @@
-import {Component, computed, Input, OnInit, Signal, signal, WritableSignal} from "@angular/core";
+import {
+  Component,
+  computed,
+  effect,
+  Input,
+  OnInit,
+  Signal,
+  signal,
+  WritableSignal
+} from "@angular/core";
 import {
   MatCard,
   MatCardActions,
@@ -68,33 +77,28 @@ export class ActionControlComponent implements OnInit {
   ));
 
   constructor(private roomControlContext: RoomControlContextService) {
+    effect(() => {
+      this.displayableActions.set(
+        this.combineActionsData(this.actions())
+      );
+    });
   }
 
   ngOnInit() {
     this.actions = this.roomControlContext.getRoomActions();
-    // const actionSnapshot = this.actions();
-
-    const defaultSequenced: SequencedAction = {
-      actionId: -1,
-      sequenceNumber: Number.MAX_VALUE,
-    };
-
-    this.displayableActions.set(
-      this.actions().map(mqttAction => {
-        let sequenced = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
-        sequenced = sequenced ? sequenced : defaultSequenced;
-        return {
-          ...mqttAction,
-          ...sequenced,
-          activated: sequenced.sequenceNumber != Number.MAX_VALUE,
-        };
-      }).sort(this.sortBySequenceNumberAndActivation),
-    );
   }
 
-  public editActions() {
-    // сортовані по актів
-    // сортовані по sequence number
+  protected combineActionsData(actions: MqttAction[]): DisplayableAction[] {
+    const defaultSequenced: SequencedAction = {actionId: -1, sequenceNumber: Number.MAX_VALUE};
+    return actions.map(mqttAction => {
+      let sequenced = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
+      sequenced = sequenced ? sequenced : defaultSequenced;
+      return {
+        ...mqttAction,
+        ...sequenced,
+        activated: sequenced.sequenceNumber != Number.MAX_VALUE,
+      };
+    }).sort(this.sortBySequenceNumberAndActivation);
   }
 
   protected sortBySequenceNumberAndActivation(a: DisplayableAction, b: DisplayableAction) {
@@ -122,8 +126,8 @@ export class ActionControlComponent implements OnInit {
 
   protected moveActionDown(action: DisplayableAction): void {
     if (!action.activated ||
-        action.sequenceNumber == this.displayableActions().length - 1 ||
-        action.sequenceNumber == this.selectedCount() - 1) {
+      action.sequenceNumber == this.displayableActions().length - 1 ||
+      action.sequenceNumber == this.selectedCount() - 1) {
       return;
     }
 
@@ -149,8 +153,10 @@ export class ActionControlComponent implements OnInit {
 
         return copy;
       }).sort(this.sortBySequenceNumberAndActivation)
-        .map(((action, index) => index < this.selectedCount() ? {...action, sequenceNumber: index} : action))
-
+        .map(((action, index) => index < this.selectedCount() ? {
+          ...action,
+          sequenceNumber: index
+        } : action))
     );
   }
 }
