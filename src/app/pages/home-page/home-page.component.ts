@@ -18,7 +18,6 @@ import {
 } from "../../components/mqtt-status-bubble/mqtt-status-bubble.component";
 import {PageRoutes} from "../../app.routes";
 import {Router} from "@angular/router";
-import {ActionControlComponent} from "../../components/action-control/action-control.component";
 
 @Component({
   selector: "app-home-page",
@@ -33,8 +32,7 @@ import {ActionControlComponent} from "../../components/action-control/action-con
     MatButton,
     ReactiveFormsModule,
     MatInput,
-    MqttStatusBubbleComponent,
-    ActionControlComponent
+    MqttStatusBubbleComponent
   ],
   templateUrl: "./home-page.component.html",
   // styleUrl: "./home-page.component.css"

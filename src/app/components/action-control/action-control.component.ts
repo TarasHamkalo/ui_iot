@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  Input,
-  OnInit,
-  Signal,
-  signal,
-  WritableSignal
-} from "@angular/core";
+import {Component, computed, Input, OnInit, Signal, signal, WritableSignal} from "@angular/core";
 import {
   MatCard,
   MatCardActions,
@@ -19,18 +10,19 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {
-  MatCell, MatCellDef,
+  MatCell,
   MatColumnDef,
-  MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef,
-  MatRow, MatRowDef,
-  MatTable
+  MatHeaderCell,
+  MatHeaderRow,
+  MatRow,
+  MatTable, MatTableModule
 } from "@angular/material/table";
 import {MqttAction} from "../../types/mqtt-action";
 import {RoomControlContextService} from "../../context/room-control-context.service";
 import {ActionGroup} from "../../types/action-group";
 import {DisplayableAction} from "../../types/displayable-action";
 import {FormsModule} from "@angular/forms";
+import {SequencedAction} from "../../types/sequenced-action";
 
 @Component({
   selector: "app-action-control",
@@ -50,11 +42,8 @@ import {FormsModule} from "@angular/forms";
     MatHeaderRow,
     MatRow,
     MatCardActions,
-    MatHeaderCellDef,
-    MatCellDef,
     FormsModule,
-    MatHeaderRowDef,
-    MatRowDef
+    MatTableModule,
   ],
   templateUrl: "./action-control.component.html",
   styleUrl: "./action-control.component.css"
@@ -71,7 +60,7 @@ export class ActionControlComponent implements OnInit {
 
   protected actions: Signal<MqttAction[]> = signal([]);
 
-  protected displayableActions: WritableSignal<Partial<DisplayableAction>[]> = signal([]);
+  protected displayableActions: WritableSignal<DisplayableAction[]> = signal([]);
 
   public selectedCount = computed(() => this.displayableActions().reduce(
     (agg, cur) => agg + (cur.activated ? 1 : 0),
@@ -83,68 +72,85 @@ export class ActionControlComponent implements OnInit {
 
   ngOnInit() {
     this.actions = this.roomControlContext.getRoomActions();
-    const actionSnapshot = this.actions();
+    // const actionSnapshot = this.actions();
+
+    const defaultSequenced: SequencedAction = {
+      actionId: -1,
+      sequenceNumber: Number.MAX_VALUE,
+    };
+
     this.displayableActions.set(
-      actionSnapshot.map(mqttAction => {
-        const sequence = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
+      this.actions().map(mqttAction => {
+        let sequenced = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
+        sequenced = sequenced ? sequenced : defaultSequenced;
         return {
           ...mqttAction,
-          ...sequence,
-          activated: !!sequence,
+          ...sequenced,
+          activated: sequenced.sequenceNumber != Number.MAX_VALUE,
         };
-      })
+      }).sort(this.sortBySequenceNumberAndActivation),
     );
   }
 
   public editActions() {
-    const actionSnapshot = this.actions();
-    this.displayableActions.set(
-      actionSnapshot.map(mqttAction => {
-        const sequence = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
-        return {
-          ...mqttAction,
-          ...sequence,
-          activated: !!sequence,
-        };
-      })
-    );
+    // сортовані по актів
+    // сортовані по sequence number
   }
 
-  protected moveActionUp(action: MqttAction): void {
-    // Logic to move action up in the list
-    // const currentActions = this.actions();
-    // const index = currentActions.indexOf(action);
-    // if (index > 0) {
-    //   const updatedActions = [...currentActions];
-    //   [updatedActions[index - 1], updatedActions[index]] = [updatedActions[index], updatedActions[index - 1]];
-    //   this.actions.set(updatedActions);
-    // }
+  protected sortBySequenceNumberAndActivation(a: DisplayableAction, b: DisplayableAction) {
+    if (a.activated === b.activated) {
+      return a.sequenceNumber - b.sequenceNumber;
+    }
+
+    if (a.activated) {
+      return -1;
+    } else {
+      return 1;
+    }
   }
 
-  // protected moveActionDown(action: MqttAction): void {
-  //   // Logic to move action down in the list
-  //   const currentActions = this.actions();
-  //   const index = currentActions.indexOf(action);
-  //   if (index < currentActions.length - 1) {
-  //     const updatedActions = [...currentActions];
-  //     [updatedActions[index + 1], updatedActions[index]] = [updatedActions[index], updatedActions[index + 1]];
-  //     this.actions.set(updatedActions);
-  //   }
-  // }
+  protected moveActionUp(action: DisplayableAction): void {
+    if (!action.activated || action.sequenceNumber == 0) {
+      return;
+    }
 
-  protected isActionActive(target: MqttAction): boolean {
-    const actions = this.actionGroup.actions?.filter((source) => {
-      return source.actionId === target.id;
-    });
+    const actions = [...this.displayableActions()];
+    actions[action.sequenceNumber - 1].sequenceNumber++;
+    actions[action.sequenceNumber].sequenceNumber--;
+    this.displayableActions.set(actions.sort(this.sortBySequenceNumberAndActivation));
+  }
 
-    return actions !== undefined && actions.length > 0;
+  protected moveActionDown(action: DisplayableAction): void {
+    if (!action.activated ||
+        action.sequenceNumber == this.displayableActions().length - 1 ||
+        action.sequenceNumber == this.selectedCount() - 1) {
+      return;
+    }
+
+    const actions = [...this.displayableActions()];
+    actions[action.sequenceNumber + 1].sequenceNumber--;
+    actions[action.sequenceNumber].sequenceNumber++;
+    this.displayableActions.set(actions.sort(this.sortBySequenceNumberAndActivation));
   }
 
   protected toggleActivation(activated: boolean, targetId: number) {
     this.displayableActions.update(actions =>
-      actions.map(
-        (action => action.id == targetId ? {...action, activated: activated} : action)
-      )
+      actions.map(action => {
+        if (action.id != targetId) {
+          return action;
+        }
+
+        const selectedCount = this.selectedCount();
+        const copy: DisplayableAction = {
+          ...action,
+          activated: activated,
+          sequenceNumber: activated ? selectedCount : Number.MAX_VALUE,
+        };
+
+        return copy;
+      }).sort(this.sortBySequenceNumberAndActivation)
+        .map(((action, index) => index < this.selectedCount() ? {...action, sequenceNumber: index} : action))
+
     );
   }
 }
