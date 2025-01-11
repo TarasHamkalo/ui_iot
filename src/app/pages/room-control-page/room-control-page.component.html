@@ -1,21 +1,19 @@
-<mat-toolbar>
+<mat-toolbar class="top-level">
   <button mat-icon-button
           aria-label="Return to home page"
           (click)="navigateHome()">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <span>{{this.roomControlContext.getControlledRoom()().name}}</span>
+  <span>{{ this.roomControlContext.getControlledRoom()().name }}</span>
 </mat-toolbar>
 
-<app-content-container>
-  @switch (tabs.selectedIndex) {
-    @case (2) {
-      <app-action-registration/>
-    }
-  }
+<app-content-container *ngIf="!this.roomPrepared">
+  <app-surface title="Preparing room data" subtitle="">
+    <mat-spinner></mat-spinner>
+  </app-surface>
 </app-content-container>
 
-<mat-tab-group #tabs class="bottom-tabs" headerPosition="below">
+<mat-tab-group *ngIf="this.roomPrepared" #tabs class="bottom-tabs" headerPosition="below">
   <mat-tab>
     <ng-template mat-tab-label>
       <div class="vertical-tab">
@@ -23,7 +21,15 @@
         Control
       </div>
     </ng-template>
+
+    <app-content-container>
+      @for (actionGroup of this.actionGroups(); track actionGroup) {
+        <app-action-control [actionGroup]="actionGroup"></app-action-control>
+      }
+    </app-content-container>
+
   </mat-tab>
+
   <mat-tab>
     <ng-template mat-tab-label aria-label="Schedule actions">
       <div class="vertical-tab">
@@ -39,5 +45,8 @@
         Register
       </div>
     </ng-template>
+    <app-content-container>
+      <app-action-registration/>
+    </app-content-container>
   </mat-tab>
 </mat-tab-group>

@@ -12,4 +12,8 @@ export const API_ROUTES = {
     add: () => `${API_ROUTES.baseUrl}/actions`,
   },
 
+  actionGroups: {
+    getAll: () => `${API_ROUTES.baseUrl}/groups`,
+    add: () => `${API_ROUTES.baseUrl}/actions`,
+  },
 };
