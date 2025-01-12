@@ -19,7 +19,7 @@ mat-tab-group {
   z-index: 2;
 
   width: 100vw;
-  height: 100vh;
+  height: 100%;
 
   ::ng-deep .mat-mdc-tab-body-wrapper {
     flex: 1 1 100%;
@@ -45,4 +45,9 @@ mat-tab-group {
   z-index: 2;
   bottom: calc(64px + 24px);
   right: 16px;
+}
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
 }

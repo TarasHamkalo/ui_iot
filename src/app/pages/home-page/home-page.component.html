@@ -5,7 +5,7 @@
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       <mat-label><small>Loading rooms</small></mat-label>
     } @else {
-      <div class="flex-horizontal">
+      <div class="flex-vertical">
         <mat-form-field appearance="outline">
           <mat-label>Room</mat-label>
           <mat-select #roomPicker (selectionChange)="this.roomControlContext.setControlledRoom(roomPicker.value)">
