@@ -51,7 +51,7 @@ export class HomePageComponent implements OnInit {
               private readonly formBuilder: FormBuilder) {
     this.roomRegistrationForm = this.formBuilder.group({
       name: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z ]*")]],
-      baseMqttTopic: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z/]*")]],
+      baseMqttTopic: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z0-9/]*")]],
     });
   }
 
