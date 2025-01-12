@@ -55,7 +55,7 @@ export class RoomControlPageComponent implements OnInit {
       }
     });
 
-    this.actionGroups = this.roomControlContext.getRoomGroups();
+    // this.actionGroups =
   }
 
   protected navigateHome() {

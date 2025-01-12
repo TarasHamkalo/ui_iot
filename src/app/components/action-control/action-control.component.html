@@ -1,9 +1,18 @@
 <mat-card appearance="outlined">
-  <mat-card-header>
+  <mat-card-header class="flex-horizontal flex-between">
     <mat-card-title>{{ this.actionGroup.displayName }}</mat-card-title>
-    <button mat-icon-button>
-      <mat-icon>edit</mat-icon>
-    </button>
+    @if (this.cardMode === "control") {
+      <button mat-icon-button (click)="this.toggleCardMode()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button
+              (click)="this.deleteGroup()"
+              matTooltip="Delete action group">
+        <mat-icon>delete</mat-icon>
+      </button>
+    }
+
   </mat-card-header>
 
   @switch (this.cardMode) {
@@ -57,10 +66,12 @@
         </table>
       </mat-card-content>
       <mat-card-actions align="end">
-        <button mat-stroked-button>
+        <button mat-stroked-button
+                (click)="this.toggleCardMode()">
           Cancel
         </button>
-        <button mat-flat-button>
+        <button mat-flat-button
+                (click)="this.updateGroup()">
           Save
         </button>
       </mat-card-actions>

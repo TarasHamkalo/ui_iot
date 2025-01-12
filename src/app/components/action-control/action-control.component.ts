@@ -32,6 +32,8 @@ import {ActionGroup} from "../../types/action-group";
 import {DisplayableAction} from "../../types/displayable-action";
 import {FormsModule} from "@angular/forms";
 import {SequencedAction} from "../../types/sequenced-action";
+import {ActionGroupRepositoryService} from "../../repository/action-group-repository.service";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: "app-action-control",
@@ -53,13 +55,14 @@ import {SequencedAction} from "../../types/sequenced-action";
     MatCardActions,
     FormsModule,
     MatTableModule,
+    MatTooltip,
   ],
   templateUrl: "./action-control.component.html",
   styleUrl: "./action-control.component.css"
 })
 export class ActionControlComponent implements OnInit {
 
-  @Input({required: true}) public actionGroup: Partial<ActionGroup> = {};
+  @Input({required: true}) public actionGroup!: ActionGroup;
 
   protected cardMode: "edit" | "control" = "edit";
 
@@ -71,16 +74,15 @@ export class ActionControlComponent implements OnInit {
 
   protected displayableActions: WritableSignal<DisplayableAction[]> = signal([]);
 
-  public selectedCount = computed(() => this.displayableActions().reduce(
+  protected selectedCount = computed(() => this.displayableActions().reduce(
     (agg, cur) => agg + (cur.activated ? 1 : 0),
     0
   ));
 
-  constructor(private roomControlContext: RoomControlContextService) {
+  constructor(private roomControlContext: RoomControlContextService,
+              private actionGroupRepository: ActionGroupRepositoryService) {
     effect(() => {
-      this.displayableActions.set(
-        this.combineActionsData(this.actions())
-      );
+      this.resetActionData();
     });
   }
 
@@ -92,11 +94,11 @@ export class ActionControlComponent implements OnInit {
     const defaultSequenced: SequencedAction = {actionId: -1, sequenceNumber: Number.MAX_VALUE};
     return actions.map(mqttAction => {
       let sequenced = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
-      sequenced = sequenced ? sequenced : defaultSequenced;
+      sequenced = sequenced === undefined ? defaultSequenced : sequenced;
       return {
         ...mqttAction,
         ...sequenced,
-        activated: sequenced.sequenceNumber != Number.MAX_VALUE,
+        activated: sequenced.sequenceNumber !== Number.MAX_VALUE,
       };
     }).sort(this.sortBySequenceNumberAndActivation);
   }
@@ -158,5 +160,37 @@ export class ActionControlComponent implements OnInit {
           sequenceNumber: index
         } : action))
     );
+  }
+
+  protected toggleCardMode() {
+    this.cardMode = this.cardMode === "edit" ? "control" : "edit";
+    this.resetActionData();
+  }
+
+  protected resetActionData() {
+    this.displayableActions.set(
+      this.combineActionsData(this.actions())
+    );
+  }
+
+  protected updateGroup() {
+    this.actionGroupRepository.updateGroup({
+      ...this.actionGroup,
+      actions: this.displayableActions().filter(a => a.activated).map((action, i) => {
+        return {
+          actionId: action.id,
+          sequenceNumber: i
+        };
+      })
+    }).subscribe({
+      next: (group) => this.roomControlContext.updateGroup(group),
+      error: console.error,
+    });
+  }
+
+  protected deleteGroup() {
+    this.actionGroupRepository.deleteGroup(this.actionGroup).subscribe({
+      next: (group) => this.roomControlContext.deleteGroup(group),
+    });
   }
 }

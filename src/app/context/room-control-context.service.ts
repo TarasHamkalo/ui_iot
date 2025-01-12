@@ -52,7 +52,15 @@ export class RoomControlContextService {
     return this.roomActions.asReadonly();
   }
 
-  public getRoomGroups() {
+  public updateGroup(target: ActionGroup) {
+    this.roomActionGroups.update(groups => groups.map(source => source.id === target.id ? target: source));
+  }
+
+  public deleteGroup(target: ActionGroup) {
+    this.roomActionGroups.update(groups => groups.filter(source => source.id !== target.id));
+  }
+
+  public getRoomActionGroups() {
     return this.roomActionGroups.asReadonly();
   }
 
@@ -71,9 +79,11 @@ export class RoomControlContextService {
     this.roomSelected.set(false);
     this.controlledRoom.set({});
     this.roomActions.set([]);
+    this.roomActionGroups.set([]);
   }
 
   public isRoomSelected(): Signal<boolean> {
     return this.roomSelected.asReadonly();
   }
+
 }

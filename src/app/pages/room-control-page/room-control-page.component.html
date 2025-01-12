@@ -23,7 +23,7 @@
     </ng-template>
 
     <app-content-container>
-      @for (actionGroup of this.actionGroups(); track actionGroup) {
+      @for (actionGroup of this.roomControlContext.getRoomActionGroups()(); track actionGroup) {
         <app-action-control [actionGroup]="actionGroup"></app-action-control>
       }
     </app-content-container>

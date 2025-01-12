@@ -17,4 +17,16 @@ export class ActionGroupRepositoryService {
     const options = {params: new HttpParams().set("roomId", room.id)};
     return this.http.get<ActionGroup[]>(API_ROUTES.actionGroups.getAll(), options);
   }
+
+  public addGroup(name: string): Observable<ActionGroup> {
+    return this.http.post<ActionGroup>(API_ROUTES.actionGroups.add(), {"name": name});
+  }
+
+  public updateGroup(group: ActionGroup): Observable<ActionGroup> {
+    return this.http.put<ActionGroup>(API_ROUTES.actionGroups.update(group.id), group);
+  }
+
+  public deleteGroup(group: ActionGroup): Observable<ActionGroup> {
+    return this.http.delete<ActionGroup>(API_ROUTES.actionGroups.delete(group.id));
+  }
 }
