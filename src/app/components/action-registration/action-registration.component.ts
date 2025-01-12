@@ -12,11 +12,10 @@ import {MatIcon} from "@angular/material/icon";
 import {IMqttMessage} from "ngx-mqtt";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {MatList, MatListItem} from "@angular/material/list";
 import {MqttActionRepositoryService} from "../../repository/mqtt-action-repository.service";
-import {NgSwitch, NgSwitchCase} from "@angular/common";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
 import {RoomControlContextService} from "../../context/room-control-context.service";
+import {MqttAction} from "../../types/mqtt-action";
 
 @Component({
   selector: "app-action-registration",
@@ -35,10 +34,7 @@ import {RoomControlContextService} from "../../context/room-control-context.serv
     MatIcon,
     MatTooltip,
     MatCheckbox,
-    MatList,
-    MatListItem,
-    NgSwitch,
-    NgSwitchCase,
+
   ],
   templateUrl: "./action-registration.component.html",
   styleUrl: "./action-registration.component.css"
@@ -65,7 +61,7 @@ export class ActionRegistrationComponent {
 
     this.basicInfoForm = this.formBuilder.group({
       actionName: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z ]*")]],
-      mqttTopic: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z/]*")]],
+      mqttTopic: ["", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z/0-9]*")]],
       mqttRetain: [false],
     });
 
@@ -131,14 +127,14 @@ export class ActionRegistrationComponent {
       const payload = JSON.parse(this.payloadForm.controls["mqttPayload"].value);
 
       this.mqttActionRepository.add({
-        id: Date.now(),
+        // id: Date.now(),
         roomId: this.roomControlContext.getControlledRoom()().id,
         displayName: this.basicInfoForm.controls["actionName"].value,
         mqttTopic: this.basicInfoForm.controls["mqttTopic"].value,
         mqttRetain: this.basicInfoForm.controls["mqttRetain"].value,
         mqttPayload: JSON.stringify(payload)
       }).subscribe({
-        next: console.log,
+        next: (action: MqttAction) => this.roomControlContext.addActionToContext(action),
         error: console.error
       });
       this.resetStepper(stepper);

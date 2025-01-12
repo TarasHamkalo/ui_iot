@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { ActionControlComponent } from "./action-control.component";
+import { ActionControlsComponent } from "./action-controls.component";
 
-describe("ActionControlComponent", () => {
-  let component: ActionControlComponent;
-  let fixture: ComponentFixture<ActionControlComponent>;
+describe("ActionControlsComponent", () => {
+  let component: ActionControlsComponent;
+  let fixture: ComponentFixture<ActionControlsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ActionControlComponent]
+      imports: [ActionControlsComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ActionControlComponent);
+    fixture = TestBed.createComponent(ActionControlsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

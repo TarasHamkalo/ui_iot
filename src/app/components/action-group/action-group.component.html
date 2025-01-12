@@ -19,21 +19,7 @@
   @switch (this.cardMode) {
     @case ("control") {
       <mat-card-content>
-        <div class="flex-vertical gap-2">
-          <mat-form-field appearance="outline">
-            <mat-label>Timeout in ms</mat-label>
-            <input matInput [formControl]="this.timeoutFormControl">
-            <mat-hint>Timeout between consecutive actions</mat-hint>
-          </mat-form-field>
-
-          <button mat-flat-button
-                  [disabled]="this.timeoutFormControl.invalid || this.publishingActions"
-                  (click)="this.publishActions()">
-            <mat-icon>send</mat-icon>
-            Send actions
-          </button>
-          <mat-divider></mat-divider>
-        </div>
+        <app-action-controls [displayableActions]="this.displayableActions"/>
       </mat-card-content>
     }
     @case ("edit") {
