@@ -17,15 +17,7 @@ import {
 } from "@angular/material/card";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {MatCheckbox} from "@angular/material/checkbox";
-import {
-  MatCell,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderRow,
-  MatRow,
-  MatTable, MatTableModule
-} from "@angular/material/table";
+import {MatTableModule} from "@angular/material/table";
 import {MqttAction} from "../../types/mqtt-action";
 import {RoomControlContextService} from "../../context/room-control-context.service";
 import {ActionGroup} from "../../types/action-group";
@@ -34,6 +26,7 @@ import {FormsModule} from "@angular/forms";
 import {SequencedAction} from "../../types/sequenced-action";
 import {ActionGroupRepositoryService} from "../../repository/action-group-repository.service";
 import {MatTooltip} from "@angular/material/tooltip";
+import {ActionTableComponent} from "../action-table/action-table.component";
 
 @Component({
   selector: "app-action-control",
@@ -45,17 +38,11 @@ import {MatTooltip} from "@angular/material/tooltip";
     MatIconButton,
     MatIcon,
     MatButton,
-    MatCheckbox,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCell,
-    MatHeaderRow,
-    MatRow,
     MatCardActions,
     FormsModule,
     MatTableModule,
     MatTooltip,
+    ActionTableComponent,
   ],
   templateUrl: "./action-control.component.html",
   styleUrl: "./action-control.component.css"
@@ -64,11 +51,7 @@ export class ActionControlComponent implements OnInit {
 
   @Input({required: true}) public actionGroup!: ActionGroup;
 
-  protected cardMode: "edit" | "control" = "edit";
-
-  protected actionsDisplayedColumns: string[] = [
-    "name", "topic", "priority", "active"
-  ];
+  protected cardMode: "edit" | "control" = "control";
 
   protected actions: Signal<MqttAction[]> = signal([]);
 
@@ -115,53 +98,6 @@ export class ActionControlComponent implements OnInit {
     }
   }
 
-  protected moveActionUp(action: DisplayableAction): void {
-    if (!action.activated || action.sequenceNumber == 0) {
-      return;
-    }
-
-    const actions = [...this.displayableActions()];
-    actions[action.sequenceNumber - 1].sequenceNumber++;
-    actions[action.sequenceNumber].sequenceNumber--;
-    this.displayableActions.set(actions.sort(this.sortBySequenceNumberAndActivation));
-  }
-
-  protected moveActionDown(action: DisplayableAction): void {
-    if (!action.activated ||
-      action.sequenceNumber == this.displayableActions().length - 1 ||
-      action.sequenceNumber == this.selectedCount() - 1) {
-      return;
-    }
-
-    const actions = [...this.displayableActions()];
-    actions[action.sequenceNumber + 1].sequenceNumber--;
-    actions[action.sequenceNumber].sequenceNumber++;
-    this.displayableActions.set(actions.sort(this.sortBySequenceNumberAndActivation));
-  }
-
-  protected toggleActivation(activated: boolean, targetId: string) {
-    this.displayableActions.update(actions =>
-      actions.map(action => {
-        if (action.id !== targetId) {
-          return action;
-        }
-
-        const selectedCount = this.selectedCount();
-        const copy: DisplayableAction = {
-          ...action,
-          activated: activated,
-          sequenceNumber: activated ? selectedCount : Number.MAX_VALUE,
-        };
-
-        return copy;
-      }).sort(this.sortBySequenceNumberAndActivation)
-        .map(((action, index) => index < this.selectedCount() ? {
-          ...action,
-          sequenceNumber: index
-        } : action))
-    );
-  }
-
   protected toggleCardMode() {
     this.cardMode = this.cardMode === "edit" ? "control" : "edit";
     this.resetActionData();
@@ -183,7 +119,10 @@ export class ActionControlComponent implements OnInit {
         };
       })
     }).subscribe({
-      next: (group) => this.roomControlContext.updateGroup(group),
+      next: (group) => {
+        this.roomControlContext.updateGroup(group);
+        this.toggleCardMode();
+      },
       error: console.error,
     });
   }

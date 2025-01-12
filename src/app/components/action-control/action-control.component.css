@@ -10,23 +10,8 @@ mat-icon-button {
   margin-left: auto;
 }
 
-.text-ellipsis-150 {
-  max-width: 150px;
-  white-space: nowrap;
-  overflow: scroll;
-}
 
 .flex-between {
   display: flex;
   justify-content: space-between;
 }
-
-@media screen and (max-width: 700px) {
-  table {
-    display: block;
-    overflow-x: auto;
-    box-sizing: border-box;
-    width: 100%;
-  }
-}
-
