@@ -43,6 +43,13 @@ mat-tab-group {
 }
 
 .top-level {
-  z-index: 1000;
   position: fixed;
+  z-index: 3;
+}
+
+.bottom-button {
+  position: fixed;
+  z-index: 2;
+  bottom: calc(64px + 24px);
+  right: 16px;
 }

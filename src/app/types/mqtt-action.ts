@@ -1,8 +1,8 @@
 export interface MqttAction {
 
-  id: number;
+  id: string;
 
-  roomId: number;
+  roomId: string;
   displayName: string;
 
   mqttTopic: string;

@@ -77,7 +77,7 @@ export class HomePageComponent implements OnInit {
   public addRoom() {
     if (!this.roomRegistrationForm.invalid) {
       this.roomRepository.add({
-        id: Date.now(), // TODO: api should fill this
+        // id: Date.now(), // TODO: api should fill this
         name: this.roomRegistrationForm.controls["name"].value,
         baseMqttTopic: this.roomRegistrationForm.controls["baseMqttTopic"].value
       }).subscribe(room => this.rooms.push(room));

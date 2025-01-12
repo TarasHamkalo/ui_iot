@@ -52,6 +52,10 @@ export class RoomControlContextService {
     return this.roomActions.asReadonly();
   }
 
+  public addGroup(group: ActionGroup) {
+    this.roomActionGroups.update(groups => [...groups, group]);
+  }
+
   public updateGroup(target: ActionGroup) {
     this.roomActionGroups.update(groups => groups.map(source => source.id === target.id ? target: source));
   }

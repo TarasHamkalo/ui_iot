@@ -15,7 +15,7 @@ export const API_ROUTES = {
   actionGroups: {
     getAll: () => `${API_ROUTES.baseUrl}/groups`,
     add: () => `${API_ROUTES.baseUrl}/groups`,
-    update: (id: number) => `${API_ROUTES.baseUrl}/groups/${id}`,
-    delete: (id: number) => `${API_ROUTES.baseUrl}/groups/${id}`,
+    update: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
+    delete: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
   },
 };

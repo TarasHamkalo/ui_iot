@@ -1,4 +1,4 @@
 export interface SequencedAction {
-  actionId: number;
+  actionId: string;
   sequenceNumber: number;
 }

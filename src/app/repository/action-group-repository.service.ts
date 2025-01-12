@@ -4,6 +4,7 @@ import {Room} from "../types/room";
 import {Observable} from "rxjs";
 import {ActionGroup} from "../types/action-group";
 import {API_ROUTES} from "./api.routes";
+import {Action} from "rxjs/internal/scheduler/Action";
 
 @Injectable({
   providedIn: "root"
@@ -18,8 +19,8 @@ export class ActionGroupRepositoryService {
     return this.http.get<ActionGroup[]>(API_ROUTES.actionGroups.getAll(), options);
   }
 
-  public addGroup(name: string): Observable<ActionGroup> {
-    return this.http.post<ActionGroup>(API_ROUTES.actionGroups.add(), {"name": name});
+  public addGroup(group: Partial<ActionGroup>): Observable<ActionGroup> {
+    return this.http.post<ActionGroup>(API_ROUTES.actionGroups.add(), group);
   }
 
   public updateGroup(group: ActionGroup): Observable<ActionGroup> {

@@ -23,7 +23,7 @@
     </ng-template>
 
     <app-content-container>
-      @for (actionGroup of this.roomControlContext.getRoomActionGroups()(); track actionGroup) {
+      @for (actionGroup of this.roomControlContext.getRoomActionGroups()(); track actionGroup.id) {
         <app-action-control [actionGroup]="actionGroup"></app-action-control>
       }
     </app-content-container>
@@ -50,3 +50,11 @@
     </app-content-container>
   </mat-tab>
 </mat-tab-group>
+
+<button mat-fab
+        class="bottom-button"
+        (click)="this.openGroupCreationDialog()"
+        extended>
+  <mat-icon>add</mat-icon>
+  Add Group
+</button>

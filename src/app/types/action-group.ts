@@ -1,9 +1,9 @@
 import {SequencedAction} from "./sequenced-action";
 
 export interface ActionGroup {
-  id: number;
+  id: string;
   displayName: string;
-  roomId: number;
+  roomId: string;
   actions: SequencedAction[];
 }
 

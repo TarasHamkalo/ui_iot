@@ -91,7 +91,7 @@ export class ActionControlComponent implements OnInit {
   }
 
   protected combineActionsData(actions: MqttAction[]): DisplayableAction[] {
-    const defaultSequenced: SequencedAction = {actionId: -1, sequenceNumber: Number.MAX_VALUE};
+    const defaultSequenced: SequencedAction = {actionId: "undefined", sequenceNumber: Number.MAX_VALUE};
     return actions.map(mqttAction => {
       let sequenced = this.actionGroup.actions?.find(seq => seq.actionId === mqttAction.id);
       sequenced = sequenced === undefined ? defaultSequenced : sequenced;
@@ -139,10 +139,10 @@ export class ActionControlComponent implements OnInit {
     this.displayableActions.set(actions.sort(this.sortBySequenceNumberAndActivation));
   }
 
-  protected toggleActivation(activated: boolean, targetId: number) {
+  protected toggleActivation(activated: boolean, targetId: string) {
     this.displayableActions.update(actions =>
       actions.map(action => {
-        if (action.id != targetId) {
+        if (action.id !== targetId) {
           return action;
         }
 
