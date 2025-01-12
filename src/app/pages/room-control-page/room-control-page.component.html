@@ -24,7 +24,7 @@
 
     <app-content-container>
       @for (actionGroup of this.roomControlContext.getRoomActionGroups()(); track actionGroup.id) {
-        <app-action-control [actionGroup]="actionGroup"></app-action-control>
+        <app-action-group [actionGroup]="actionGroup"></app-action-group>
       }
     </app-content-container>
 

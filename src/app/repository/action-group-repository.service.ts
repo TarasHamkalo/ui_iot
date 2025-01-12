@@ -1,10 +1,9 @@
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Room} from "../types/room";
 import {Observable} from "rxjs";
 import {ActionGroup} from "../types/action-group";
 import {API_ROUTES} from "./api.routes";
-import {Action} from "rxjs/internal/scheduler/Action";
 
 @Injectable({
   providedIn: "root"
