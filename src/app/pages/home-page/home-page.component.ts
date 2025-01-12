@@ -10,7 +10,13 @@ import {MatOption} from "@angular/material/core";
 import {MatSelect} from "@angular/material/select";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {MatButton} from "@angular/material/button";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  FormBuilder,
+  FormGroup,
+  FormGroupDirective,
+  ReactiveFormsModule,
+  Validators
+} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {RoomControlContextService} from "../../context/room-control-context.service";
 import {
@@ -18,6 +24,7 @@ import {
 } from "../../components/mqtt-status-bubble/mqtt-status-bubble.component";
 import {PageRoutes} from "../../app.routes";
 import {Router} from "@angular/router";
+import {connectable} from "rxjs";
 
 @Component({
   selector: "app-home-page",
@@ -40,6 +47,8 @@ import {Router} from "@angular/router";
 export class HomePageComponent implements OnInit {
 
   protected loading = false;
+
+  protected mqttBrokerConnected = false;
 
   protected rooms: Room[] = [];
 
@@ -74,17 +83,24 @@ export class HomePageComponent implements OnInit {
     });
   }
 
-  public addRoom() {
+  public addRoom(form: FormGroupDirective) {
     if (!this.roomRegistrationForm.invalid) {
       this.roomRepository.add({
-        // id: Date.now(), // TODO: api should fill this
         name: this.roomRegistrationForm.controls["name"].value,
         baseMqttTopic: this.roomRegistrationForm.controls["baseMqttTopic"].value
-      }).subscribe(room => this.rooms.push(room));
+      }).subscribe(room => {
+        this.rooms.push(room);
+        form.resetForm();
+      });
     }
   }
 
   public roomPicked() {
     this.router.navigate([`/${PageRoutes.CONTROL}`]);
+  }
+
+  protected setConnected(connected: boolean) {
+    console.log(connected);
+    this.mqttBrokerConnected = connected;
   }
 }

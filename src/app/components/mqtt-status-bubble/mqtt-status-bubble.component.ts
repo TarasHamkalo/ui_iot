@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, effect, EventEmitter, OnInit, Output} from "@angular/core";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
@@ -16,11 +16,17 @@ import {MatTooltip} from "@angular/material/tooltip";
 })
 export class MqttStatusBubbleComponent implements OnInit {
 
+  @Output() public connected = new EventEmitter<boolean>();
+
   constructor(public readonly mqttWrapper: MqttWrapperService) {
+    effect(() => {
+      this.connected.emit(this.mqttWrapper.isConnected());
+    });
   }
 
   ngOnInit(): void {
     this.mqttWrapper.connect();
+
   }
 
   public reconnect(): void {
