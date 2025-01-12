@@ -1,0 +1,42 @@
+<app-content-container>
+  <app-surface>
+    <form [formGroup]="this.scheduleFormGroup" (ngSubmit)="onSubmit(form)" #form=ngForm>
+      <div class="flex-vertical">
+        <mat-form-field appearance="outline">
+          <mat-label>Action group</mat-label>
+
+          <mat-select formControlName="actionGroup" >
+            @for (group of this.roomControlContextService.getRoomActionGroups()(); track group.id) {
+              <mat-option [value]="group">{{ group.displayName }}</mat-option>
+            }
+          </mat-select>
+
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Pick a time (UTC + 1)</mat-label>
+          <input matInput
+                 [matTimepicker]="timePicker"
+                 formControlName="time">
+          <mat-timepicker-toggle matIconSuffix [for]="timePicker"/>
+          <mat-timepicker #timePicker/>
+        </mat-form-field>
+
+        <mat-chip-listbox
+          aria-label="Select days of the week"
+          formControlName="selectedDays"
+          multiple>
+          <mat-chip-option
+            *ngFor="let day of days; index as i"
+            [value]="i">
+            {{ day }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+        <button mat-button
+                type="submit"
+                [disabled]="this.scheduleFormGroup.invalid"
+        >Schedule</button>
+      </div>
+    </form>
+  </app-surface>
+</app-content-container>

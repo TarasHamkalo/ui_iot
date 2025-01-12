@@ -4,6 +4,7 @@ import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 import {provideRouter} from "@angular/router";
 import {routes} from "./app.routes";
 import {IMqttServiceOptions, MqttClientService, MqttServiceConfig} from "ngx-mqtt";
+import {provideNativeDateAdapter} from "@angular/material/core";
 
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: import.meta.env.NG_APP_MQTT_HOSTNAME,
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideRouter(routes),
     provideAnimationsAsync(),
+    provideNativeDateAdapter(),
     provideHttpClient(withInterceptorsFromDi()),
     {
       provide: MqttServiceConfig,

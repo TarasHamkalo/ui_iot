@@ -18,4 +18,11 @@ export const API_ROUTES = {
     update: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
     delete: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
   },
+
+  schedules: {
+    add: () => `${API_ROUTES.baseUrl}/schedules`,
+    getAll: () => `${API_ROUTES.baseUrl}/schedules`,
+    delete: (id: string) => `${API_ROUTES.baseUrl}/schedules/${id}`,
+  }
+
 };
