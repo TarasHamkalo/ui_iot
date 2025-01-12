@@ -106,7 +106,6 @@ export class ActionGroupComponent implements OnInit {
 
   protected toggleCardMode() {
     this.cardMode = this.cardMode === "edit" ? "control" : "edit";
-    this.resetActionData();
   }
 
   protected resetActionData() {
