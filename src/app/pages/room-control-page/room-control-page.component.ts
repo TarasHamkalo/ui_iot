@@ -20,6 +20,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {StringModalComponent} from "../../components/base/string-modal/string-modal.component";
 import {concatMap, throwError} from "rxjs";
 import {ActionGroupComponent} from "../../components/action-group/action-group.component";
+import {ActionScheduleComponent} from "../../components/action-schedule/action-schedule.component";
 
 @Component({
   selector: "app-room-control-page",
@@ -35,6 +36,7 @@ import {ActionGroupComponent} from "../../components/action-group/action-group.c
     ActionRegistrationComponent,
     MatFabButton,
     ActionGroupComponent,
+    ActionScheduleComponent,
   ],
   templateUrl: "./room-control-page.component.html",
   styleUrl: "./room-control-page.component.scss"

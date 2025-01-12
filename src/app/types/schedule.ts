@@ -1,4 +1,4 @@
-export interface ScheduledActionGroup {
+export interface Schedule {
   id: string;
   actionGroupId: string;
 

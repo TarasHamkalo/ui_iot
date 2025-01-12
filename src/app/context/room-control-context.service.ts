@@ -5,6 +5,8 @@ import {MqttAction} from "../types/mqtt-action";
 import {MqttActionRepositoryService} from "../repository/mqtt-action-repository.service";
 import {ActionGroup} from "../types/action-group";
 import {ActionGroupRepositoryService} from "../repository/action-group-repository.service";
+import {Schedule} from "../types/schedule";
+import {SchedulesRepositoryService} from "../repository/schedules-repository.service";
 
 @Injectable({
   providedIn: "root"
@@ -19,21 +21,26 @@ export class RoomControlContextService {
 
   private roomActionGroups = signal<ActionGroup[]>([]);
 
+  private roomSchedules = signal<Schedule[]>([]);
+
   private preparedSubject = new Subject<boolean>();
 
   constructor(private readonly actionRepository: MqttActionRepositoryService,
-              private readonly actionGroupsRepository: ActionGroupRepositoryService) {
+              private readonly actionGroupsRepository: ActionGroupRepositoryService,
+              private readonly schedulesRepository: SchedulesRepositoryService) {
   }
 
   public prepareRoom(): Observable<boolean> {
     forkJoin({
       actions: this.actionRepository.getAllByRoomId(this.controlledRoom() as Room),
-      groups: this.actionGroupsRepository.getAllByRoomId(this.controlledRoom() as Room)
+      groups: this.actionGroupsRepository.getAllByRoomId(this.controlledRoom() as Room),
+      schedules: this.schedulesRepository.getAllByRoomId(this.controlledRoom() as Room)
     }).subscribe({
       next: (data) => {
         console.log(data);
         this.roomActions.set(data.actions);
         this.roomActionGroups.set(data.groups);
+        this.roomSchedules.set(data.schedules);
         this.preparedSubject.next(true);
       },
       error: () => {
@@ -67,6 +74,21 @@ export class RoomControlContextService {
   public getRoomActionGroups() {
     return this.roomActionGroups.asReadonly();
   }
+  public isRoomSelected(): Signal<boolean> {
+    return this.roomSelected.asReadonly();
+  }
+
+  public addSchedule(schedule: Schedule) {
+    this.roomSchedules.update(schedules => [...schedules, schedule]);
+  }
+
+  public deleteSchedule(target: Schedule) {
+    this.roomSchedules.update(schedules => schedules.filter(source => source.id !== target.id));
+  }
+
+  public getRoomSchedules() {
+    return this.roomSchedules.asReadonly();
+  }
 
   public setControlledRoom(room: Partial<Room>) {
     if (room) {
@@ -84,10 +106,7 @@ export class RoomControlContextService {
     this.controlledRoom.set({});
     this.roomActions.set([]);
     this.roomActionGroups.set([]);
-  }
-
-  public isRoomSelected(): Signal<boolean> {
-    return this.roomSelected.asReadonly();
+    this.roomSchedules.set([]);
   }
 
 }
