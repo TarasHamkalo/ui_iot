@@ -19,8 +19,11 @@ mat-tab-group {
   z-index: 2;
 
   width: 100vw;
+  height: 100vh;
 
-  //background-color: var(--mat-sys-surface-container);
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    flex: 1 1 100%;
+  }
 }
 
 .vertical-tab {
@@ -30,16 +33,6 @@ mat-tab-group {
 
   gap: 8px;
   padding: 4px;
-}
-
-mat-tab-group {
-  height: 100%;
-
-  ::ng-deep .mat-mdc-tab-body-wrapper {
-    //height: 100%;
-    flex: 1 1 100%;
-    padding-top: calc(64px + 24px);
-  }
 }
 
 .top-level {
