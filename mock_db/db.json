@@ -1,14 +1,165 @@
 {
   "rooms": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Hyperion",
       "baseMqttTopic": "kpi/hyperion"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Kronos",
       "baseMqttTopic": "kpi/kronos"
+    },
+    {
+      "id": "3",
+      "name": "Caprica",
+      "baseMqttTopic": "/kpi/paprica"
+    },
+    {
+      "id": "b90a",
+      "name": "paprica",
+      "baseMqttTopic": "kpi/paprica"
+    },
+    {
+      "id": "7630",
+      "name": "tmp",
+      "baseMqttTopic": "tmp/th776no"
+    },
+    {
+      "id": "9181",
+      "name": "Caprica",
+      "baseMqttTopic": "kpi/caprica"
     }
-  ]
+  ],
+  "actions": [
+    {
+      "id": "1",
+      "roomId": "1",
+      "displayName": "Turn on Living Room Light",
+      "mqttTopic": "light/cmd",
+      "mqttPayload ": "{\"cmd\": \"on\"}",
+      "mqttRetain": true
+    },
+    {
+      "id": "2",
+      "roomId": "2",
+      "displayName": "Adjust Thermostat",
+      "mqttTopic": "ac/set",
+      "mqttPayload": "{\"temperature\": 22.0}",
+      "mqttRetain": true
+    },
+    {
+      "id": "3",
+      "roomId": "1",
+      "displayName": "Turn on Small Lights",
+      "mqttTopic": "light/cmd",
+      "mqttPayload ": "{\"cmd\": \"on\"}",
+      "mqttRetain": true
+    },
+    {
+      "id": "7706",
+      "roomId": "1",
+      "displayName": "asdfaskfjl",
+      "mqttTopic": "alskdfjasl",
+      "mqttRetain": false,
+      "mqttPayload": "{\"A\":1}"
+    },
+    {
+      "id": "2766",
+      "roomId": "7630",
+      "displayName": "first",
+      "mqttTopic": "first",
+      "mqttRetain": true,
+      "mqttPayload": "{\"Data\":null}"
+    },
+    {
+      "id": "3a11",
+      "roomId": "7630",
+      "displayName": "second",
+      "mqttTopic": "first",
+      "mqttRetain": false,
+      "mqttPayload": "{\"Data\":\"1\"}"
+    },
+    {
+      "id": "90a6",
+      "roomId": "9181",
+      "displayName": "Climatization Turn On",
+      "mqttTopic": "ac",
+      "mqttRetain": false,
+      "mqttPayload": "{\"cmd\":\"on\"}"
+    },
+    {
+      "id": "6e26",
+      "roomId": "9181",
+      "displayName": "asfdasflkj",
+      "mqttTopic": "aslkdfjas",
+      "mqttRetain": null,
+      "mqttPayload": "{\"data\":null}"
+    }
+  ],
+  "groups": [
+    {
+      "id": "adfa",
+      "roomId": "7630",
+      "displayName": "Main",
+      "actions": [
+        {
+          "actionId": "2766",
+          "sequenceNumber": 0
+        },
+        {
+          "actionId": "3a11",
+          "sequenceNumber": 1
+        }
+      ]
+    },
+    {
+      "id": "18fd",
+      "roomId": "7630",
+      "displayName": "some group",
+      "actions": []
+    },
+    {
+      "id": "20a3",
+      "roomId": "1",
+      "displayName": "asfdasdfsa",
+      "actions": [
+        {
+          "actionId": "1",
+          "sequenceNumber": 0
+        },
+        {
+          "actionId": "3",
+          "sequenceNumber": 1
+        },
+        {
+          "actionId": "7706",
+          "sequenceNumber": 2
+        }
+      ]
+    },
+    {
+      "id": "c2a6",
+      "roomId": "9181",
+      "displayName": "Main",
+      "actions": [
+        {
+          "actionId": "90a6",
+          "sequenceNumber": 0
+        }
+      ]
+    },
+    {
+      "id": "d8bc",
+      "roomId": "2",
+      "displayName": "asfasdf",
+      "actions": [
+        {
+          "actionId": "2",
+          "sequenceNumber": 0
+        }
+      ]
+    }
+  ],
+  "schedules": []
 }
