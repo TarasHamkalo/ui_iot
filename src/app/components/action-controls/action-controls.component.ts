@@ -1,5 +1,5 @@
-import {Component, Input, signal, WritableSignal} from "@angular/core";
-import {MatButton} from "@angular/material/button";
+import {Component, computed, Input, signal, WritableSignal} from "@angular/core";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTableModule} from "@angular/material/table";
 import {MqttAction} from "../../types/mqtt-action";
@@ -9,6 +9,7 @@ import {MqttActionPublisherService} from "../../services/mqtt-action-publisher.s
 import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: "app-action-controls",
@@ -23,7 +24,9 @@ import {MatTab, MatTabGroup} from "@angular/material/tabs";
     MatLabel,
     MatHint,
     MatTabGroup,
-    MatTab
+    MatTab,
+    NgIf,
+    MatIconButton
   ],
   templateUrl: "./action-controls.component.html",
   styleUrl: "./action-controls.component.css"
@@ -43,26 +46,55 @@ export class ActionControlsComponent {
 
   protected publishingActions = false;
 
-  // protected currentAction: WritableSignal<DisplayableAction>;
+  protected activeActions = computed(() => {
+    return this.displayableActions()
+      .filter(a => a.activated)
+      .sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+  });
+
+  protected lastAction = -1;
 
   constructor(private mqttActionPublisherService: MqttActionPublisherService) {
-    // this.currentAction = signal(this.displayableActions().f)
+
   }
 
-  protected publishActions() {
-    const actionsToPublish: MqttAction[] = this.displayableActions()
+  protected publishAll() {
+    const actions: MqttAction[] = this.displayableActions()
       .filter(a => a.activated)
       .map((action) => action as MqttAction);
 
-    if (actionsToPublish.length > 0) {
+    this.publish(actions);
+  }
+
+  protected next() {
+    const activeLength = this.activeActions().length;
+    if (activeLength > 0 && this.lastAction < activeLength - 1) {
+      // console.log(this.activeActions().at(this.lastAction + 1));
+      this.publish([this.activeActions().at(this.lastAction + 1)!]);
+      this.lastAction++;
+    }
+
+    console.log(this.lastAction);
+  }
+
+  protected prev() {
+    const activeLength = this.activeActions().length;
+    if (activeLength > 0 && this.lastAction > 0) {
+      // console.log(this.activeActions().at(this.lastAction - 1));
+      this.publish([this.activeActions().at(this.lastAction - 1)!]);
+      this.lastAction--;
+    }
+
+  }
+
+  private publish(actions: MqttAction[]) {
+    if (actions.length > 0) {
       this.publishingActions = true;
-      this.mqttActionPublisherService.publish(actionsToPublish, this.timeoutFormControl.value!)
+      this.mqttActionPublisherService.publish(actions, this.timeoutFormControl.value!)
         .subscribe({
           next: () => this.publishingActions = false,
           error: () => this.publishingActions = false,
         });
     }
   }
-
-
 }

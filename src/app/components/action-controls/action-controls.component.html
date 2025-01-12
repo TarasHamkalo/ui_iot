@@ -1,4 +1,10 @@
-<div class="flex-vertical gap-2">
+<div *ngIf="this.activeActions().length === 0">
+  <div class="flex-vertical">
+      <mat-icon color="primary">sentiment_dissatisfied</mat-icon>
+      <p><small>Firstly, modify the group to contain actions</small></p>
+  </div>
+</div>
+<div *ngIf="this.activeActions().length > 0" class="flex-vertical gap-2">
   <mat-form-field class="full-width" appearance="outline">
     <mat-label>Timeout in ms</mat-label>
     <input matInput [formControl]="this.timeoutFormControl">
@@ -10,7 +16,7 @@
       <div class="flex-vertical">
         <button mat-flat-button
                 [disabled]="this.timeoutFormControl.invalid || this.publishingActions"
-                (click)="this.publishActions()">
+                (click)="this.publishAll()">
           <mat-icon>send</mat-icon>
           Send actions
         </button>
@@ -19,15 +25,22 @@
 
     <mat-tab label="Sequence">
       <div class="flex-vertical">
-        <!--                  <button mat-icon-button-->
-        <!--                          [disabled]="this.timeoutFormControl.invalid || this.publishingActions"-->
-        <!--                          (click)="this.publishNext()">-->
-        <!--                    <mat-icon>arrow_up</mat-icon>-->
-        <!--                  </button>-->
-        <!--                  <p>{{this.currentAction || "No actions in action group"}}</p>-->
-        <!--                  <button mat-icon-button-->
-        <!--                          [disabled]="this.timeoutFormControl.invalid || this.publishingActions"-->
-        <!--                          (click)="this.publishPrev()">-->
+          <button mat-icon-button
+                  [disabled]="this.timeoutFormControl.invalid || this.publishingActions"
+                  (click)="this.next()">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+          @if (this.lastAction === -1) {
+            No actions sent
+          } @else {
+            <p>{{this.activeActions().at(this.lastAction)!.displayName}}</p>
+          }
+          <button mat-icon-button
+                  [disabled]="this.timeoutFormControl.invalid || this.publishingActions"
+                  (click)="this.prev()">
+            <mat-icon>arrow_downward</mat-icon>
+
+          </button>
       </div>
     </mat-tab>
   </mat-tab-group>
