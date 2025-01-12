@@ -10,8 +10,19 @@ mat-icon-button {
   margin-left: auto;
 }
 
-
 .flex-between {
   display: flex;
   justify-content: space-between;
+}
+
+.size-48 {
+  font-size: 48px;
+}
+
+.delete-button {
+  color: red;
+}
+
+.gap-2 {
+  gap: 2rem;
 }
