@@ -1,0 +1,67 @@
+<app-surface title="Air Conditioning"
+             subtitle="For auto mode to work, setup two action groups, which will be triggered each time conditioning should be ON/OFF.">
+  @switch (this.mode) {
+    @case ("config") {
+      <div class="flex-horizontal full-width wrap">
+        <div class="flex-vertical high-container">
+          <div class="flex-horizontal full-width metric-group">
+            <app-room-metric sensorName="Hermetic"
+                             metricName="hermetic"
+                             [deviceId]="this.hermeticitySensorId"/>
+            <app-room-metric sensorName="VOC"
+                             metricName="voc"
+                             [deviceId]="this.vocSensorId"/>
+            <app-room-metric sensorName="Co2" metricName="co2"
+                             [deviceId]="this.co2SensorId"/>
+          </div>
+
+          <div class="action-groups">
+            <mat-form-field appearance="outline">
+              <mat-label>Turn ON</mat-label>
+              <mat-select [formControl]="this.onGroupFormControl">
+                @for (group of this.roomControlContext.getRoomActionGroups()(); track group.id) {
+                  <mat-option [value]="group">{{ group.displayName }}</mat-option>
+                }
+              </mat-select>
+              <mat-hint>Group for turning ON</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Turn OFF</mat-label>
+              <mat-select [formControl]="this.offGroupFormControl">
+                @for (group of this.roomControlContext.getRoomActionGroups()(); track group.id) {
+                  <mat-option [value]="group">{{ group.displayName }}</mat-option>
+                }
+              </mat-select>
+
+              <mat-hint>Group for turning OFF</mat-hint>
+            </mat-form-field>
+          </div>
+          <button mat-flat-button
+                  (click)="this.uploadConfiguration()"
+                  [disabled]="!this.isConfigValid()">
+            Update Config
+          </button>
+        </div>
+        <div class="flex-vertical control">
+          <button mat-flat-button>ON</button>
+        </div>
+
+      </div>
+    } @case ("init") {
+      <div class="flex-vertical init-container">
+        <mat-form-field appearance="outline" class="full-width">
+
+          <mat-label>IR device ID</mat-label>
+          <input #deviceIdInput matInput pattern="[a-zA-z0-9]+" required/>
+        </mat-form-field>
+        <button mat-flat-button
+                color="primary"
+                class="full-width">
+<!--                (click)="this.connectToIrDevice(deviceIdInput.value)"-->
+<!--                [disabled]="!deviceIdInput.checkValidity()">-->
+          Start
+        </button>
+      </div>
+    }
+  }
+</app-surface>
