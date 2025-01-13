@@ -1,10 +1,10 @@
-import {Component, inject, Input, signal} from "@angular/core";
+import {Component, effect, inject, Input, OnDestroy, signal} from "@angular/core";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
 import {StringModalComponent} from "../base/string-modal/string-modal.component";
-import {concatMap, throwError} from "rxjs";
+import {concatMap, Subject, Subscription, takeUntil, throwError} from "rxjs";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
 import {IMqttMessage} from "ngx-mqtt";
 import {Metric} from "../../types/metric";
@@ -19,7 +19,7 @@ import {Metric} from "../../types/metric";
   templateUrl: "./room-metric.component.html",
   styleUrl: "./room-metric.component.css"
 })
-export class RoomMetricComponent {
+export class RoomMetricComponent implements OnDestroy {
 
   public readonly METRIC_FIELD: string = "metrics";
 
@@ -27,13 +27,22 @@ export class RoomMetricComponent {
 
   @Input({required: true}) public metricName!: string;
 
-  protected deviceId = signal<string | undefined>(undefined);
+  @Input() public deviceId = signal<string | undefined>(undefined);
 
   protected metricValue = signal<string | undefined>(undefined);
 
   private dialog = inject(MatDialog);
 
+  private destroy$ = new Subject<void>();
+
   constructor(private mqttWrapper: MqttWrapperService) {
+    effect(() => {
+      console.log("effect");
+      console.log(this.deviceId());
+      if (this.deviceId() !== undefined) {
+        this.subscribeToDeviceId(this.deviceId()!);
+      }
+    });
   }
 
   protected openDeviceInfoUpdateModal(): void {
@@ -46,29 +55,34 @@ export class RoomMetricComponent {
       },
     });
 
+    if (this.destroy$.observed) {
+      this.destroy$.next();
+    }
 
-    dialogRef.afterClosed().pipe(
-      concatMap(deviceId => {
-        if (deviceId !== undefined) {
-          return this.mqttWrapper.topic(deviceId);
-        }
+    dialogRef.afterClosed()
+      .pipe(
+        concatMap((deviceId) => {
+          if (deviceId) {
+            this.deviceId.set(deviceId);
+            return this.mqttWrapper.topic(deviceId);
+          }
+          throw new Error("Cancel device ID update");
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (message: IMqttMessage) => {
+          this.metricValue.set(this.extractMetricValue(message));
+        },
+        error: (error) => console.error(`Error updating device info:`, error),
+      });
 
-        throw throwError(() => new Error("Cancel device id update"));
-      }),
-    ).subscribe({
-      next: (message: IMqttMessage) => {
-        this.metricValue.set(this.extractMetricValue(message));
-      },
-      error: console.error
-    });
   }
 
   private extractMetricValue(message: IMqttMessage): string | undefined {
     try {
       const payload = JSON.parse(message.payload.toString());
-      console.log(payload);
       const metricsField = payload?.[this.METRIC_FIELD];
-      console.log(metricsField);
       if (!Array.isArray(metricsField)) {
         return undefined;
       }
@@ -81,4 +95,20 @@ export class RoomMetricComponent {
     }
   }
 
+  private subscribeToDeviceId(deviceId: string): void {
+    this.mqttWrapper
+      .topic(deviceId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (message: IMqttMessage) => {
+          this.metricValue.set(this.extractMetricValue(message));
+        },
+        error: (error) => console.error(`Error with topic subscription:`, error),
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

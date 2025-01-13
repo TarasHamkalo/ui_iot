@@ -1,6 +1,6 @@
 <p class="tiny">{{sensorName}}</p>
 <div class="sensor-status">
-  @if (this.deviceId()) {
+  @if (this.deviceId() === undefined) {
     <button mat-icon-button
             aria-label="Setup device id, the topic it will be available at"
             matTooltip="Setup device id, the topic it will be available at"
