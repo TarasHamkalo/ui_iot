@@ -16,6 +16,7 @@
 }
 
 .tiny {
+  text-align: center;
   font: var(--mat-sys-title-small);
   color: var(--mat-sys-on-surface);
   margin: 0;

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { RoomStatusComponent } from "./room-status.component";
+import { RoomMetricComponent } from "./room-metric.component";
 
 describe("SensorStatusComponent", () => {
-  let component: RoomStatusComponent;
-  let fixture: ComponentFixture<RoomStatusComponent>;
+  let component: RoomMetricComponent;
+  let fixture: ComponentFixture<RoomMetricComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RoomStatusComponent]
+      imports: [RoomMetricComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RoomStatusComponent);
+    fixture = TestBed.createComponent(RoomMetricComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

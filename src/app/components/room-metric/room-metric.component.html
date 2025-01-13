@@ -1,6 +1,6 @@
-<p class="tiny">Hermeticity</p>
+<p class="tiny">{{sensorName}}</p>
 <div class="sensor-status">
-  @if (this.deviceId() === "unknown") {
+  @if (this.deviceId()) {
     <button mat-icon-button
             aria-label="Setup device id, the topic it will be available at"
             matTooltip="Setup device id, the topic it will be available at"
@@ -15,9 +15,6 @@
         check_circle
       </mat-icon>
     </button>
-    <p class="small">hermetic</p>
+    <p class="small">{{this.metricValue()}}</p>
   }
 </div>
-
-<!--по а string modal for device id-->
-<!--по б мусить постити статус стрінгом /deviceid/room-status -->
