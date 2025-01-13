@@ -25,6 +25,7 @@ import {
 import {PageRoutes} from "../../app.routes";
 import {Router} from "@angular/router";
 import {connectable} from "rxjs";
+import {AcAutoModeComponent} from "../../components/ac-auto-mode/ac-auto-mode.component";
 
 @Component({
   selector: "app-home-page",
@@ -39,7 +40,8 @@ import {connectable} from "rxjs";
     MatButton,
     ReactiveFormsModule,
     MatInput,
-    MqttStatusBubbleComponent
+    MqttStatusBubbleComponent,
+    AcAutoModeComponent
   ],
   templateUrl: "./home-page.component.html",
   // styleUrl: "./home-page.component.css"

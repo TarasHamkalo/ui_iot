@@ -45,6 +45,8 @@ export class ActionRegistrationComponent {
 
   public readonly DATA_READ_TIMEOUT: number = 3_000;
 
+  public readonly IR_SEND_COMMAND = "send";
+
   protected readonly basicInfoForm: FormGroup;
 
   protected readonly payloadForm: FormGroup;
@@ -52,7 +54,6 @@ export class ActionRegistrationComponent {
   protected payloadTabIndex = 0;
 
   protected deviceState: "connected" | "connecting" | "disconnected" = "disconnected";
-
 
   constructor(private mqttIrService: MqttIrService,
               private mqttActionRepository: MqttActionRepositoryService,
@@ -104,8 +105,12 @@ export class ActionRegistrationComponent {
       })
     ).subscribe({
       next: (message: IMqttMessage) => {
-        const payload = JSON.parse(message.payload.toString());
-        this.payloadForm.controls["mqttPayload"].setValue(message.payload.toString());
+        const payload = {
+          cmd: this.IR_SEND_COMMAND,
+          ...JSON.parse(message.payload.toString())
+        };
+        console.log(payload);
+        this.payloadForm.controls["mqttPayload"].setValue(JSON.stringify(payload));
         this.payloadTabIndex = 0;
         console.log(payload);
       },
