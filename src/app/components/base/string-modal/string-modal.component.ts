@@ -36,8 +36,10 @@ export class StringModalComponent {
 
   protected readonly placeholder = this.data.placeholder;
 
+  protected readonly allowedPattern = this.data.pattern ? this.data.patttern : "[a-zA-Z ]*";
+
   protected readonly alphaString = new FormControl(
-    "", [Validators.required, Validators.maxLength(150), Validators.pattern("[a-zA-Z ]*")]
+    "", [Validators.required, Validators.maxLength(150), Validators.pattern(this.allowedPattern)]
   );
 
   protected onSubmit(value: string) {

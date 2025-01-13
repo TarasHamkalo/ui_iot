@@ -1,0 +1,22 @@
+.sensor-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 4px;
+  padding: 8px;
+  background-color: var(--mat-sys-surface-container-high);
+  border-radius: var(--mat-sys-corner-small);
+}
+
+.small {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+}
+
+.tiny {
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+}

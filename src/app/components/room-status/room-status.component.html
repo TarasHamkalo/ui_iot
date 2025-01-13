@@ -1,0 +1,23 @@
+<p class="tiny">Hermeticity</p>
+<div class="sensor-status">
+  @if (this.deviceId() === "unknown") {
+    <button mat-icon-button
+            aria-label="Setup device id, the topic it will be available at"
+            matTooltip="Setup device id, the topic it will be available at"
+            (click)="this.openDeviceInfoUpdateModal()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  } @else {
+    <button mat-icon-button
+            (click)="this.openDeviceInfoUpdateModal()">
+      <mat-icon aria-label="Update device id"
+                matTooltip="Update device id">
+        check_circle
+      </mat-icon>
+    </button>
+    <p class="small">hermetic</p>
+  }
+</div>
+
+<!--по а string modal for device id-->
+<!--по б мусить постити статус стрінгом /deviceid/room-status -->
