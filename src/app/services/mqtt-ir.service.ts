@@ -3,6 +3,7 @@ import {MqttWrapperService} from "./mqtt-wrapper.service";
 import {Observable} from "rxjs";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../types/ac-auto-mode-config";
+import {PersistentSignal} from "../types/persistent-signal";
 
 @Injectable({
   providedIn: "root"
@@ -27,8 +28,15 @@ export class MqttIrService {
         type: "ac_auto_mode_config",
         value: acAutoModeConfig,
       }
-    })
+    }),
 
+    persistSignalsCmd: (groupName: string, signals: PersistentSignal[]) => JSON.stringify({
+      cmd: "persist",
+      args: {
+        group_name: groupName,
+        signals: signals,
+      }
+    }),
   };
 
   constructor(private mqttWrapper: MqttWrapperService) {
@@ -55,6 +63,13 @@ export class MqttIrService {
 
   public pullAcAutoModeConfig(deviceId: string): Observable<IMqttMessage> {
     return this.mqttWrapper.topic(this.IR_TOPICS.config(deviceId));
+  }
+
+  public persistSignals(deviceId: string, groupName: "on" | "off", signals: PersistentSignal[]) {
+    this.mqttWrapper.publish(
+      this.IR_TOPICS.cmd(deviceId),
+      this.IR_PAYLOADS.persistSignalsCmd(groupName, signals)
+    );
   }
 
 }

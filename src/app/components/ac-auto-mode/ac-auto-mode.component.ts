@@ -2,7 +2,7 @@ import {Component, signal} from "@angular/core";
 import {SurfaceComponent} from "../base/surface/surface.component";
 import {RoomMetricComponent} from "../room-metric/room-metric.component";
 import {MatButton} from "@angular/material/button";
-import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
+import {MatError, MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {RoomControlContextService} from "../../context/room-control-context.service";
 import {
@@ -15,12 +15,14 @@ import {
 } from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {filter, first, of, timeout} from "rxjs";
+import {filter, first, takeWhile, timeout, timer} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../../types/ac-auto-mode-config";
 import {ActionGroup} from "../../types/action-group";
-import {DecimalPipe} from "@angular/common";
+import {DecimalPipe, NgIf} from "@angular/common";
+import {MqttAction} from "../../types/mqtt-action";
+import {PersistentSignal} from "../../types/persistent-signal";
 
 @Component({
   selector: "app-ac-auto-mode",
@@ -37,9 +39,11 @@ import {DecimalPipe} from "@angular/common";
     MatInput,
     MatProgressSpinner,
     DecimalPipe,
+    NgIf,
+    MatError,
   ],
   templateUrl: "./ac-auto-mode.component.html",
-  styleUrl: "./ac-auto-mode.component.css"
+  styleUrl: "./ac-auto-mode.component.scss"
 })
 export class AcAutoModeComponent {
 
@@ -55,11 +59,21 @@ export class AcAutoModeComponent {
   protected co2SensorId = signal<string | undefined>(undefined);
 
   protected onGroupFormControl: FormControl = new FormControl<ActionGroup | null>(
-    null, [Validators.required, this.maxActionsValidator(this.MAX_ACTIONS_ALLOWED)]
+    null,
+    [
+      Validators.required,
+      this.maxActionsValidator(this.MAX_ACTIONS_ALLOWED),
+      this.irActionsValidator()
+    ]
   );
 
   protected offGroupFormControl: FormControl = new FormControl<ActionGroup | null>(
-    null, [Validators.required, this.maxActionsValidator(this.MAX_ACTIONS_ALLOWED)]
+    null,
+    [
+      Validators.required,
+      this.maxActionsValidator(this.MAX_ACTIONS_ALLOWED),
+      this.irActionsValidator()
+    ]
   );
 
   protected mode: "init" | "config" = "init";
@@ -85,7 +99,21 @@ export class AcAutoModeComponent {
         }
       );
 
-      // of(
+      timer(2000, 2000).pipe(takeWhile((t: number) => t < 2)).subscribe(t => {
+        if (t == 0) {
+          this.mqttIrService.persistSignals(
+            this.irDeviceId()!,
+            "on",
+            this.getActionGroupPayload(this.onGroupFormControl.value)
+          );
+        } else {
+          this.mqttIrService.persistSignals(
+            this.irDeviceId()!,
+            "off",
+            this.getActionGroupPayload(this.offGroupFormControl.value)
+          );
+        }
+      });
     }
   }
 
@@ -99,26 +127,13 @@ export class AcAutoModeComponent {
     );
   }
 
-  protected maxActionsValidator(max: number): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const actionGroup = control.value as ActionGroup | null;
-
-      if (!actionGroup || !actionGroup.actions) {
-        return null;
-      }
-
-      return actionGroup.actions.length > max ?
-        {maxActions: {max: max, actual: actionGroup.actions.length}} : null;
-    };
-  }
-
   protected connectToIrDevice(deviceId: string) {
     this.loadingConfig = true;
     this.mqttIrService.pullAcAutoModeConfig(deviceId).pipe(
       timeout(this.PULL_CONFIG_TIMEOUT),
       first(),
       filter((message: IMqttMessage) => {
-        const payload =JSON.parse(message.payload.toString());
+        const payload = JSON.parse(message.payload.toString());
         return Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD);
       }),
     ).subscribe({
@@ -154,4 +169,81 @@ export class AcAutoModeComponent {
     this.onGroupFormControl.setValue(onGroup ?? null);
     this.offGroupFormControl.setValue(offGroup ?? null);
   }
+
+
+  protected maxActionsValidator(max: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const actionGroup = control.value as ActionGroup | null;
+
+      if (!actionGroup || !actionGroup.actions) {
+        return null;
+      }
+
+      return actionGroup.actions.length > max ?
+        {maxActions: {max: max, actual: actionGroup.actions.length}} : null;
+    };
+  }
+
+  protected irActionsValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const actionGroup = control.value as ActionGroup | null;
+
+      if (!actionGroup || !actionGroup.actions) {
+        return null;
+      }
+
+      const notIrSignalPresent = actionGroup.actions
+        ?.map(action => this.roomControlContext.getRoomActions()().find(s => s.id === action.actionId))
+        .filter(action => !this.isValidMqttAction(action)).length > 0;
+
+      return notIrSignalPresent ? {notIrSignalPresent: true} : null;
+    };
+  }
+
+  private getActionGroupPayload(actionGroup: ActionGroup): PersistentSignal[] {
+    return actionGroup.actions
+      ?.map(action => this.roomControlContext.getRoomActions()().find(s => s.id === action.actionId))
+      .filter(action => this.isValidMqttAction(action))
+      .map((action, i) => {
+        const data = JSON.parse(action!.mqttPayload.toString()).data;
+        return {
+          id: i,
+          data: data
+        } as PersistentSignal;
+      });
+  }
+
+  private isValidMqttAction(action: MqttAction | undefined): boolean {
+    if (action === undefined || action.mqttPayload === undefined) {
+      return false;
+    }
+
+    try {
+      const parsedPayload = JSON.parse(action.mqttPayload);
+      return Array.isArray(parsedPayload.data);
+    } catch {
+      return false;
+    }
+  }
+
+  private getContentError(control: AbstractControl, errorType: string): string | null {
+    if (control.errors) {
+      return null;
+    }
+
+    switch (errorType) {
+      case "maxActions": {
+        const maxActionsError = control.getError("maxActions");
+        return `Maximum ${maxActionsError.max} actions allowed. Currently selected: ${maxActionsError.actual}.`;
+      }
+      case "notIrSignalPresent": {
+        return "One or more actions do not contain a valid IR signal.";
+      }
+      default: {
+        return null;
+      }
+    }
+
+  }
+
 }

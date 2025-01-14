@@ -25,6 +25,13 @@
               </mat-select>
               <mat-hint>Max actions allowed: {{ this.MAX_ACTIONS_ALLOWED | number: '1.0-0' }}
               </mat-hint>
+              <mat-error *ngIf="this.onGroupFormControl.hasError('maxActions')">
+                Maximum {{ this.onGroupFormControl.getError('maxActions')?.max }} actions allowed.
+                Currently selected: {{ this.onGroupFormControl.getError('maxActions')?.actual }}.
+              </mat-error>
+              <mat-error *ngIf="this.onGroupFormControl.hasError('notIrSignalPresent')">
+                One or more actions do not contain a valid IR signal.
+              </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Turn OFF</mat-label>
@@ -36,6 +43,13 @@
 
               <mat-hint>Max actions allowed: {{ this.MAX_ACTIONS_ALLOWED | number: '1.0-0' }}
               </mat-hint>
+              <mat-error *ngIf="this.offGroupFormControl.hasError('maxActions')">
+                Maximum {{ this.offGroupFormControl.getError('maxActions')?.max }} actions allowed.
+                Currently selected: {{ this.offGroupFormControl.getError('maxActions')?.actual }}.
+              </mat-error>
+              <mat-error *ngIf="this.offGroupFormControl.hasError('notIrSignalPresent')">
+                One or more actions do not contain a valid IR signal.
+              </mat-error>
             </mat-form-field>
           </div>
           <button mat-flat-button
