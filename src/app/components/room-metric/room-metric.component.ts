@@ -4,7 +4,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
 import {StringModalComponent} from "../base/string-modal/string-modal.component";
-import {concatMap, Subject, takeUntil} from "rxjs";
+import {concatMap, Observable, Subject, takeUntil} from "rxjs";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
 import {IMqttMessage} from "ngx-mqtt";
 import {Metric} from "../../types/metric";
@@ -21,7 +21,7 @@ import {Metric} from "../../types/metric";
 })
 export class RoomMetricComponent implements OnDestroy {
 
-  public readonly METRIC_FIELD: string = "metrics";
+  public readonly METRIC_DATA_TOPIC: string = "data";
 
   @Input({required: true}) public sensorName!: string;
 
@@ -31,16 +31,17 @@ export class RoomMetricComponent implements OnDestroy {
 
   protected metricValue = signal<string | undefined>(undefined);
 
+  private static subscriptions = new Map<string, Observable<IMqttMessage>>();
+
   private dialog = inject(MatDialog);
 
   private destroy$ = new Subject<void>();
 
   constructor(private mqttWrapper: MqttWrapperService) {
     effect(() => {
-      console.log("effect");
       console.log(this.deviceId());
       if (this.deviceId() !== undefined) {
-        this.subscribeToDeviceId(this.deviceId()!);
+        this.subscribeToDevice(this.deviceId()!);
       }
     });
   }
@@ -64,7 +65,7 @@ export class RoomMetricComponent implements OnDestroy {
         concatMap((deviceId) => {
           if (deviceId) {
             this.deviceId.set(deviceId);
-            return this.mqttWrapper.topic(deviceId);
+            return this.mqttWrapper.topic(`${deviceId}/${this.METRIC_DATA_TOPIC}`);
           }
           throw new Error("Cancel device ID update");
         }),
@@ -82,12 +83,11 @@ export class RoomMetricComponent implements OnDestroy {
   private extractMetricValue(message: IMqttMessage): string | undefined {
     try {
       const payload = JSON.parse(message.payload.toString());
-      const metricsField = payload?.[this.METRIC_FIELD];
-      if (!Array.isArray(metricsField)) {
+      if (!Array.isArray(payload)) {
         return undefined;
       }
 
-      const metric = (payload.metrics as Metric[]).find(m => m.name === this.metricName);
+      const metric = (payload as Metric[]).find(m => m.name === this.metricName);
       console.log(`metric ${metric?.value}`);
       return metric?.value;
     } catch {
@@ -95,9 +95,9 @@ export class RoomMetricComponent implements OnDestroy {
     }
   }
 
-  private subscribeToDeviceId(deviceId: string): void {
+  private subscribeToDevice(deviceId: string): void {
     this.mqttWrapper
-      .topic(deviceId)
+      .topic(`${deviceId}/${this.METRIC_DATA_TOPIC}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (message: IMqttMessage) => {
@@ -105,6 +105,7 @@ export class RoomMetricComponent implements OnDestroy {
         },
         error: (error) => console.error(`Error with topic subscription:`, error),
       });
+
   }
 
   ngOnDestroy(): void {

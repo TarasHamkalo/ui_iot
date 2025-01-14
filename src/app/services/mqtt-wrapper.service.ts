@@ -51,7 +51,6 @@ export class MqttWrapperService {
   }
 
   public withBaseTopic(topic: string): string {
-    // const baseTopic = "tmp";
     const baseTopic = this.controlledRoom().baseMqttTopic;
     if (baseTopic !== undefined) {
       return`${baseTopic}/${topic}`;
