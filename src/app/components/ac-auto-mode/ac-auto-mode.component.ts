@@ -5,14 +5,22 @@ import {MatButton} from "@angular/material/button";
 import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {RoomControlContextService} from "../../context/room-control-context.service";
-import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  FormControl,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {filter, first, timeout} from "rxjs";
+import {filter, first, of, timeout} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../../types/ac-auto-mode-config";
 import {ActionGroup} from "../../types/action-group";
+import {DecimalPipe} from "@angular/common";
 
 @Component({
   selector: "app-ac-auto-mode",
@@ -28,6 +36,7 @@ import {ActionGroup} from "../../types/action-group";
     MatHint,
     MatInput,
     MatProgressSpinner,
+    DecimalPipe,
   ],
   templateUrl: "./ac-auto-mode.component.html",
   styleUrl: "./ac-auto-mode.component.css"
@@ -37,6 +46,7 @@ export class AcAutoModeComponent {
   public readonly PULL_CONFIG_TIMEOUT = 3_000;
 
   public readonly AC_AUTO_CONfIG_FIELD = "ac_auto_mode_config";
+  public readonly MAX_ACTIONS_ALLOWED = 5;
 
   protected hermeticitySensorId = signal<string | undefined>(undefined);
 
@@ -44,9 +54,13 @@ export class AcAutoModeComponent {
 
   protected co2SensorId = signal<string | undefined>(undefined);
 
-  protected onGroupFormControl: FormControl = new FormControl(null, [Validators.required]);
+  protected onGroupFormControl: FormControl = new FormControl<ActionGroup | null>(
+    null, [Validators.required, this.maxActionsValidator(this.MAX_ACTIONS_ALLOWED)]
+  );
 
-  protected offGroupFormControl: FormControl = new FormControl(null, [Validators.required]);
+  protected offGroupFormControl: FormControl = new FormControl<ActionGroup | null>(
+    null, [Validators.required, this.maxActionsValidator(this.MAX_ACTIONS_ALLOWED)]
+  );
 
   protected mode: "init" | "config" = "init";
 
@@ -70,6 +84,8 @@ export class AcAutoModeComponent {
           hermiticity_id: this.hermeticitySensorId()!,
         }
       );
+
+      // of(
     }
   }
 
@@ -83,6 +99,18 @@ export class AcAutoModeComponent {
     );
   }
 
+  protected maxActionsValidator(max: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const actionGroup = control.value as ActionGroup | null;
+
+      if (!actionGroup || !actionGroup.actions) {
+        return null;
+      }
+
+      return actionGroup.actions.length > max ?
+        {maxActions: {max: max, actual: actionGroup.actions.length}} : null;
+    };
+  }
 
   protected connectToIrDevice(deviceId: string) {
     this.loadingConfig = true;
@@ -90,7 +118,8 @@ export class AcAutoModeComponent {
       timeout(this.PULL_CONFIG_TIMEOUT),
       first(),
       filter((message: IMqttMessage) => {
-          return JSON.parse(message.payload.toString()).hasOwn(this.AC_AUTO_CONfIG_FIELD);
+        const payload =JSON.parse(message.payload.toString());
+        return Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD);
       }),
     ).subscribe({
       next: (message: IMqttMessage) => {
@@ -120,7 +149,7 @@ export class AcAutoModeComponent {
     const onGroup: ActionGroup | undefined = this.roomControlContext.getRoomActionGroups()()
       .find(g => g.id === config.on_action_group_id);
     const offGroup: ActionGroup | undefined = this.roomControlContext.getRoomActionGroups()()
-      .find(g => g.id === config.on_action_group_id);
+      .find(g => g.id === config.off_action_group_id);
 
     this.onGroupFormControl.setValue(onGroup ?? null);
     this.offGroupFormControl.setValue(offGroup ?? null);

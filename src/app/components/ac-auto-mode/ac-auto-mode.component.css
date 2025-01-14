@@ -37,3 +37,9 @@ p {
 .init-container {
   max-width: 350px;
 }
+
+.small {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+}

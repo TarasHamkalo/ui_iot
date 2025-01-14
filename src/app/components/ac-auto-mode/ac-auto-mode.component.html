@@ -23,7 +23,8 @@
                   <mat-option [value]="group">{{ group.displayName }}</mat-option>
                 }
               </mat-select>
-              <mat-hint>Group for turning ON</mat-hint>
+              <mat-hint>Max actions allowed: {{ this.MAX_ACTIONS_ALLOWED | number: '1.0-0' }}
+              </mat-hint>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Turn OFF</mat-label>
@@ -33,7 +34,8 @@
                 }
               </mat-select>
 
-              <mat-hint>Group for turning OFF</mat-hint>
+              <mat-hint>Max actions allowed: {{ this.MAX_ACTIONS_ALLOWED | number: '1.0-0' }}
+              </mat-hint>
             </mat-form-field>
           </div>
           <button mat-flat-button
@@ -49,8 +51,8 @@
       </div>
     }
     @case ("init") {
-      <div class="flex-vertical init-container">
-        @if (!this.loadingConfig) {
+      @if (!this.loadingConfig) {
+        <div class="flex-vertical init-container">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>IR device ID</mat-label>
             <input #deviceIdInput matInput pattern="[a-zA-z0-9]+" required/>
@@ -62,11 +64,13 @@
                   [disabled]="!deviceIdInput.checkValidity()">
             Start
           </button>
-        } @else {
+        </div>
+      } @else {
+        <div class="flex-vertical">
           <mat-spinner></mat-spinner>
-          <p class="small">Pulling auto mode config (Timeout ms: {{this.PULL_CONFIG_TIMEOUT}})</p>
-        }
-      </div>
+          <p class="small">Pulling auto mode config (Timeout ms: {{ this.PULL_CONFIG_TIMEOUT }})</p>
+        </div>
+      }
     }
   }
 </app-surface>
