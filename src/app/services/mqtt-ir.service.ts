@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {MqttWrapperService} from "./mqtt-wrapper.service";
-import {first, map, Observable, switchMap, throwError, timeout} from "rxjs";
+import {first, map, Observable, throwError, timeout} from "rxjs";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../types/ac-auto-mode-config";
 import {PersistentSignal} from "../types/persistent-signal";

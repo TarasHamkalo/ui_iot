@@ -21,6 +21,7 @@ import {StringModalComponent} from "../../components/base/string-modal/string-mo
 import {concatMap, throwError} from "rxjs";
 import {ActionGroupComponent} from "../../components/action-group/action-group.component";
 import {ActionScheduleComponent} from "../../components/action-schedule/action-schedule.component";
+import {AcAutoModeComponent} from "../../components/ac-auto-mode/ac-auto-mode.component";
 
 @Component({
   selector: "app-room-control-page",
@@ -37,6 +38,7 @@ import {ActionScheduleComponent} from "../../components/action-schedule/action-s
     MatFabButton,
     ActionGroupComponent,
     ActionScheduleComponent,
+    AcAutoModeComponent,
   ],
   templateUrl: "./room-control-page.component.html",
   styleUrl: "./room-control-page.component.scss"

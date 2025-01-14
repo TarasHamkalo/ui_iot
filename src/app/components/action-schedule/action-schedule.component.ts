@@ -19,17 +19,14 @@ import {DecimalPipe, NgForOf, NgIf} from "@angular/common";
 import {MatButton} from "@angular/material/button";
 import {SchedulesRepositoryService} from "../../repository/schedules-repository.service";
 import {Schedule} from "../../types/schedule";
-import {ActionGroup} from "../../types/action-group";
 import {
-  MatCell,
-  MatCellDef,
+  MatCell, MatCellDef,
   MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef, MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatHeaderCell, MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef,
+  MatRow, MatRowDef,
   MatTable
 } from "@angular/material/table";
-import {join} from "@angular/compiler-cli";
-import {share} from "rxjs";
 import {MatIcon} from "@angular/material/icon";
 
 @Component({
@@ -54,16 +51,16 @@ import {MatIcon} from "@angular/material/icon";
     MatTable,
     MatColumnDef,
     MatHeaderCell,
-    MatHeaderCellDef,
-    MatCellDef,
     MatCell,
     DecimalPipe,
     MatHeaderRow,
     MatRow,
-    MatRowDef,
-    MatHeaderRowDef,
     NgIf,
     MatIcon,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatHeaderRowDef,
+    MatRowDef,
   ],
   templateUrl: "./action-schedule.component.html",
   styleUrl: "./action-schedule.component.css"

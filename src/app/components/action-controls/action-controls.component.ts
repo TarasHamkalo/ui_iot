@@ -55,7 +55,6 @@ export class ActionControlsComponent {
   protected lastAction = -1;
 
   constructor(private mqttActionPublisherService: MqttActionPublisherService) {
-
   }
 
   protected publishAll() {
