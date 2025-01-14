@@ -1,17 +1,22 @@
-FROM node:alpine
+FROM node:slim AS build
 LABEL authors="taras-hamkalo"
 
-WORKDIR /usr/src/app
+ARG BUILD_ENV
 
-COPY package.json package-lock.json ./
+WORKDIR /app
 
-RUN npm install -g @angular/cli
-RUN npm install -g @angular/
+COPY package*.json ./
 
 RUN npm install
 
+RUN npm install -g @angular/cli
+
 COPY . .
 
-EXPOSE 4200
+COPY .env.$BUILD_ENV ./
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
+RUN NG_APP_ENV=$BUILD_ENV ng build
+
+FROM nginx:latest AS runtime
+COPY --from=build /app/dist/ui_iot/browser /usr/share/nginx/html
+EXPOSE 80

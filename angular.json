@@ -13,6 +13,12 @@
         "build": {
           "builder": "@ngx-env/builder:application",
           "options": {
+            "ngxEnv": {
+              "verbose": true,
+              "root": "../..",
+              "prefix": "^NG_APP_",
+              "runtime": true
+            },
             "outputPath": "dist/ui_iot",
             "index": "src/index.html",
             "browser": "src/main.ts",
