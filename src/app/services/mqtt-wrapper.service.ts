@@ -46,6 +46,7 @@ export class MqttWrapperService {
   }
 
   public topic(topic: string): Observable<IMqttMessage> {
+    console.log(this.withBaseTopic(topic));
     return this.mqttService.observe(this.withBaseTopic(topic));
   }
 

@@ -1,4 +1,4 @@
-<p class="tiny">{{sensorName}}</p>
+<p class="tiny">{{ sensorName }}</p>
 <div class="sensor-status">
   @if (this.deviceId() === undefined) {
     <button mat-icon-button
@@ -15,6 +15,6 @@
         check_circle
       </mat-icon>
     </button>
-    <p class="small">{{this.metricValue() || "No value"}}</p>
+    <p class="small">{{ this.metricValue() === undefined ? "No value" : this.metricValue() }}</p>
   }
 </div>
