@@ -18,5 +18,6 @@ COPY .env.$BUILD_ENV ./
 RUN NG_APP_ENV=$BUILD_ENV ng build
 
 FROM nginx:latest AS runtime
+RUN rm -rf /usr/share/nginx/html/*
 COPY --from=build /app/dist/ui_iot/browser /usr/share/nginx/html
 EXPOSE 80
