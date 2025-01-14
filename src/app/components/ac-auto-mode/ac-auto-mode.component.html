@@ -63,7 +63,11 @@
                   color="primary"
                   [disabled]="!this.isConfigValid()"
                   (click)="this.toggleAutoMode()">
-            {{this.autoModeEnabled() ? "Off" : "On"}}
+            @if (this.autoModeEnabled()) {
+              ON
+            } @else {
+              OFF
+            }
           </button>
         </div>
 
@@ -87,7 +91,7 @@
       } @else {
         <div class="flex-vertical">
           <mat-spinner></mat-spinner>
-          <p class="small">Pulling auto mode config (Timeout ms: {{ this.PULL_CONFIG_TIMEOUT }})</p>
+          <p class="small">Pulling auto mode config (Timeout ms: {{ this.mqttIrService.PULL_CONFIG_TIMEOUT }})</p>
         </div>
       }
     }

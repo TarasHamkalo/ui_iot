@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {MqttWrapperService} from "./mqtt-wrapper.service";
-import {first, map, Observable, switchMap} from "rxjs";
+import {first, map, Observable, switchMap, throwError, timeout} from "rxjs";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../types/ac-auto-mode-config";
 import {PersistentSignal} from "../types/persistent-signal";
@@ -49,6 +49,10 @@ export class MqttIrService {
 
   public readonly AUTO_MODE_STATUS = "auto";
 
+  public readonly AC_AUTO_CONfIG_FIELD = "ac_auto_mode_config";
+
+  public readonly PULL_CONFIG_TIMEOUT = 3_000;
+
   constructor(private mqttWrapper: MqttWrapperService) {
   }
 
@@ -71,8 +75,19 @@ export class MqttIrService {
     );
   }
 
-  public pullAcAutoModeConfig(deviceId: string): Observable<IMqttMessage> {
-    return this.mqttWrapper.topic(this.IR_TOPICS.config(deviceId));
+  public pullAcAutoModeConfig(deviceId: string): Observable<Partial<AcAutoModeConfig>> {
+    return this.mqttWrapper.topic(this.IR_TOPICS.config(deviceId))
+      .pipe(
+        timeout(this.PULL_CONFIG_TIMEOUT),
+        first(),
+        map((message: IMqttMessage) => {
+          const payload = JSON.parse(message.payload.toString());
+          if (Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD)) {
+            return payload[this.AC_AUTO_CONfIG_FIELD] as Partial<AcAutoModeConfig>;
+          }
+          throw throwError(() => new Error("Payload do not contain auto config field"));
+        })
+      );
   }
 
   public persistSignals(deviceId: string, groupName: "on" | "off", signals: PersistentSignal[]) {
@@ -83,14 +98,20 @@ export class MqttIrService {
   }
 
   public setAutoMode(deviceId: string, enabled: boolean) {
+    console.log(deviceId, enabled);
     this.mqttWrapper.publish(
       this.IR_TOPICS.cmd(deviceId),
       this.IR_PAYLOADS.setAutoModeCmd(enabled)
     );
 
+    return this.isAutoModeEnabled(deviceId);
+  }
+
+  public isAutoModeEnabled(deviceId: string) {
     return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId)).pipe(
       first(),
-      switchMap((message: IMqttMessage) => {
+      map((message: IMqttMessage) => {
+        console.log(message.payload.toString());
         const payload = JSON.parse(message.payload.toString());
         if (Object.hasOwn(payload, "status")) {
           return payload.status;

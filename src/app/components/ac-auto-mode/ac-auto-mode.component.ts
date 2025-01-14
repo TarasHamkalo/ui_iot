@@ -15,7 +15,7 @@ import {
 } from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {first, map, takeWhile, throwError, timeout, timer} from "rxjs";
+import {first, map, switchMap, takeWhile, tap, throwError, timeout, timer} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../../types/ac-auto-mode-config";
@@ -48,9 +48,6 @@ import {PersistentSignal} from "../../types/persistent-signal";
 })
 export class AcAutoModeComponent {
 
-  public readonly PULL_CONFIG_TIMEOUT = 3_000;
-
-  public readonly AC_AUTO_CONfIG_FIELD = "ac_auto_mode_config";
   public readonly MAX_ACTIONS_ALLOWED = 5;
 
   protected hermeticitySensorId = signal<string | undefined>(undefined);
@@ -86,7 +83,7 @@ export class AcAutoModeComponent {
   protected autoModeEnabled = signal(false);
 
   constructor(protected roomControlContext: RoomControlContextService,
-              private mqttIrService: MqttIrService) {
+              protected mqttIrService: MqttIrService) {
   }
 
   protected uploadConfiguration() {
@@ -117,6 +114,8 @@ export class AcAutoModeComponent {
           );
         }
       });
+
+      this.mqttIrService.isAutoModeEnabled(this.irDeviceId()!).subscribe(this.autoModeEnabled.set);
     }
   }
 
@@ -132,37 +131,30 @@ export class AcAutoModeComponent {
 
   protected connectToIrDevice(deviceId: string) {
     this.loadingConfig = true;
-    this.mqttIrService.pullAcAutoModeConfig(deviceId).pipe(
-      timeout(this.PULL_CONFIG_TIMEOUT),
-      first(),
-      map((message: IMqttMessage) => {
-        const payload = JSON.parse(message.payload.toString());
-        if (Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD)) {
-          return message;
-        }
-        throw throwError(() => new Error("Payload do not contain auto config field"));
-      })
-    ).subscribe({
-      next: (message: IMqttMessage) => {
-        this.irDeviceId.set(deviceId);
-        this.loadingConfig = false;
-        this.mode = "config";
-        this.setAcAutoConfig(message);
-      },
-      error: (err) => {
-        this.irDeviceId.set(deviceId);
-        this.mode = "config";
-        this.loadingConfig = false;
-        console.error(err);
-      }
-    });
+    this.mqttIrService.pullAcAutoModeConfig(deviceId)
+      .pipe(
+        tap({
+          next: () => {
+            this.loadingConfig = false;
+            this.mode = "config";
+            this.irDeviceId.set(deviceId);
+          },
+          error: () => {
+            this.loadingConfig = false;
+            this.mode = "config";
+            this.irDeviceId.set(deviceId);
+          }
+        }),
+        switchMap((config: Partial<AcAutoModeConfig>) => {
+          this.setAcAutoConfig(config);
+          console.log("setting config", config, " device id is ", deviceId);
+          return this.mqttIrService.isAutoModeEnabled(this.irDeviceId()!);
+        })
+      ).subscribe(this.autoModeEnabled.set);
+
   }
 
-  // pull auto mode config, no config found at ir/status
-  public setAcAutoConfig(message: IMqttMessage) {
-    const payload = JSON.parse(message.payload.toString());
-    const config: Partial<AcAutoModeConfig> = payload[this.AC_AUTO_CONfIG_FIELD];
-
+  public setAcAutoConfig(config: Partial<AcAutoModeConfig>) {
     this.vocSensorId.set(config.voc_id);
     this.hermeticitySensorId.set(config.hermiticity_id);
     this.co2SensorId.set(config.co2_id);
@@ -233,9 +225,7 @@ export class AcAutoModeComponent {
   }
 
   protected toggleAutoMode() {
-    this.mqttIrService.setAutoMode(this.irDeviceId()!, this.autoModeEnabled())
-      .subscribe((enabled: boolean) => {
-        this.autoModeEnabled.set(enabled);
-      });
+    this.mqttIrService.setAutoMode(this.irDeviceId()!, !this.autoModeEnabled())
+      .subscribe((enabled: boolean) => this.autoModeEnabled.set(enabled));
   }
 }
