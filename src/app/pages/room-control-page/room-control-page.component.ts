@@ -22,6 +22,9 @@ import {concatMap, throwError} from "rxjs";
 import {ActionGroupComponent} from "../../components/action-group/action-group.component";
 import {ActionScheduleComponent} from "../../components/action-schedule/action-schedule.component";
 import {AcAutoModeComponent} from "../../components/ac-auto-mode/ac-auto-mode.component";
+import {
+  WindowBlindsAutoModeComponent
+} from "../../components/window-blinds-auto-mode/window-blinds-auto-mode.component";
 
 @Component({
   selector: "app-room-control-page",
@@ -39,6 +42,7 @@ import {AcAutoModeComponent} from "../../components/ac-auto-mode/ac-auto-mode.co
     ActionGroupComponent,
     ActionScheduleComponent,
     AcAutoModeComponent,
+    WindowBlindsAutoModeComponent,
   ],
   templateUrl: "./room-control-page.component.html",
   styleUrl: "./room-control-page.component.scss"

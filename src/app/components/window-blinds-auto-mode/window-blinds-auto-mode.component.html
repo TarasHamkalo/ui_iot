@@ -1,0 +1,67 @@
+<app-surface title="Window blinds"
+             subtitle="For auto mode to work, setup blinds motor mqtt id">
+  @switch (this.mode) {
+    @case ("config") {
+      <div class="flex-horizontal full-width wrap">
+        <div class="flex-vertical high-container">
+          <div class="flex-horizontal  metric-group">
+            <app-room-metric metricName="light"
+                             sensorName="Daylight"
+                             [deviceId]="this.blindsControllerId">
+            </app-room-metric>
+            <app-room-metric metricName="opened" sensorName="Blinds"
+                             [deviceId]="this.blindsMotorId">
+            </app-room-metric>
+            <app-room-metric metricName="projector_live" sensorName="Projector"
+                             [deviceId]="this.blindsControllerId">
+            </app-room-metric>
+          </div>
+
+          <button mat-flat-button
+                  (click)="this.uploadConfiguration()"
+                  [disabled]="!this.blindsMotorId()">
+            Update Config
+          </button>
+        </div>
+
+        <div class="control">
+          <button mat-flat-button
+                  color="primary"
+                  [disabled]="!this.blindsMotorId()"
+                  (click)="this.toggleAutoMode()">
+            @if (this.autoModeEnabled()) {
+              ON
+            } @else {
+              OFF
+            }
+          </button>
+        </div>
+
+      </div>
+    }
+    @case ("init") {
+      @if (!this.loadingConfig) {
+        <div class="flex-vertical init-container">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Controller ID</mat-label>
+            <input #deviceIdInput matInput pattern="[A-z0-9\/]+" required/>
+          </mat-form-field>
+          <button mat-flat-button
+                  color="primary"
+                  class="full-width"
+                  (click)="this.connectToControllerDevice(deviceIdInput.value)"
+                  [disabled]="!deviceIdInput.checkValidity()">
+            Start
+          </button>
+        </div>
+      } @else {
+        <div class="flex-vertical">
+          <mat-spinner></mat-spinner>
+          <p class="small">Pulling auto mode config (Timeout
+            ms: {{ this.mqttBlindsService.PULL_CONFIG_TIMEOUT }})</p>
+        </div>
+      }
+    }
+  }
+
+</app-surface>
