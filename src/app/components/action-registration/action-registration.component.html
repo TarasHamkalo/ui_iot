@@ -38,7 +38,16 @@
               <mat-label>Payload (JSON format)</mat-label>
               <textarea #payloadInput matInput formControlName="mqttPayload" rows="5"></textarea>
             </mat-form-field>
-            <mat-hint align="start">Enter valid JSON format</mat-hint>
+            <!--            <mat-hint align="start">Enter valid JSON format</mat-hint>-->
+            <mat-error *ngIf="this.payloadForm.controls['mqttPayload'].hasError('required')">
+              Payload is required.
+            </mat-error>
+            <mat-error *ngIf="this.payloadForm.controls['mqttPayload'].hasError('maxlength')">
+              Payload must not exceed 2000 characters.
+            </mat-error>
+            <mat-error *ngIf="this.payloadForm.controls['mqttPayload'].hasError('invalidJson')">
+              Payload must be valid JSON.
+            </mat-error>
           </div>
         </mat-tab>
         <mat-tab label="IR">

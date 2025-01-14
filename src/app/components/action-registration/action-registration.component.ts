@@ -1,6 +1,12 @@
 import {Component} from "@angular/core";
 import {MatStepper, MatStepperModule} from "@angular/material/stepper";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule, ValidationErrors,
+  Validators
+} from "@angular/forms";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
@@ -16,6 +22,7 @@ import {MqttActionRepositoryService} from "../../repository/mqtt-action-reposito
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
 import {RoomControlContextService} from "../../context/room-control-context.service";
 import {MqttAction} from "../../types/mqtt-action";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: "app-action-registration",
@@ -34,6 +41,7 @@ import {MqttAction} from "../../types/mqtt-action";
     MatIcon,
     MatTooltip,
     MatCheckbox,
+    NgIf,
 
   ],
   templateUrl: "./action-registration.component.html",
@@ -67,7 +75,7 @@ export class ActionRegistrationComponent {
     });
 
     this.payloadForm = this.formBuilder.group({
-      mqttPayload: ["", Validators.required],
+      mqttPayload: ["", [Validators.required, Validators.maxLength(2000), this.jsonValidator]],
       irDeviceId: [""],
     });
   }
@@ -160,4 +168,16 @@ export class ActionRegistrationComponent {
     stepper.reset();
   }
 
+  protected jsonValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    try {
+      JSON.parse(control.value);
+      return null;
+    } catch {
+      return { invalidJson: true };
+    }
+  }
 }
