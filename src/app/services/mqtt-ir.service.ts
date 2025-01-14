@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {MqttWrapperService} from "./mqtt-wrapper.service";
-import {Observable} from "rxjs";
+import {first, map, Observable, switchMap} from "rxjs";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../types/ac-auto-mode-config";
 import {PersistentSignal} from "../types/persistent-signal";
@@ -14,12 +14,12 @@ export class MqttIrService {
     cmd: (deviceId: string) => `${deviceId}/cmd`,
     data: (deviceId: string) => `${deviceId}/data`,
     status: (deviceId: string) => `${deviceId}/status`,
-    config: (deviceId: string) => `${deviceId}/config`,
-    cmdStatus: (deviceId: string) => `${deviceId}/cmd/status`,
+    config: (deviceId: string) => `${deviceId}/status`,
   };
 
   public readonly IR_PAYLOADS = {
     recordCmd: JSON.stringify({cmd: "record"}),
+
     stopRecordingCmd: JSON.stringify({cmd: "standby"}),
 
     setConfigCmd: (acAutoModeConfig: AcAutoModeConfig) => JSON.stringify({
@@ -37,7 +37,17 @@ export class MqttIrService {
         signals: signals,
       }
     }),
+
+    setAutoModeCmd: (enabled: boolean) => JSON.stringify({
+      cmd: "auto",
+      args: {
+        enabled: enabled
+      }
+    }),
+
   };
+
+  public readonly AUTO_MODE_STATUS = "auto";
 
   constructor(private mqttWrapper: MqttWrapperService) {
   }
@@ -72,4 +82,23 @@ export class MqttIrService {
     );
   }
 
+  public setAutoMode(deviceId: string, enabled: boolean) {
+    this.mqttWrapper.publish(
+      this.IR_TOPICS.cmd(deviceId),
+      this.IR_PAYLOADS.setAutoModeCmd(enabled)
+    );
+
+    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId)).pipe(
+      first(),
+      switchMap((message: IMqttMessage) => {
+        const payload = JSON.parse(message.payload.toString());
+        if (Object.hasOwn(payload, "status")) {
+          return payload.status;
+        }
+
+        return null;
+      }),
+      map(status => status === this.AUTO_MODE_STATUS)
+    );
+  }
 }

@@ -15,7 +15,7 @@ import {
 } from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {filter, first, takeWhile, timeout, timer} from "rxjs";
+import {first, map, takeWhile, throwError, timeout, timer} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../../types/ac-auto-mode-config";
@@ -41,6 +41,7 @@ import {PersistentSignal} from "../../types/persistent-signal";
     DecimalPipe,
     NgIf,
     MatError,
+
   ],
   templateUrl: "./ac-auto-mode.component.html",
   styleUrl: "./ac-auto-mode.component.scss"
@@ -81,6 +82,8 @@ export class AcAutoModeComponent {
   protected irDeviceId = signal<string | undefined>(undefined);
 
   protected loadingConfig = false;
+
+  protected autoModeEnabled = signal(false);
 
   constructor(protected roomControlContext: RoomControlContextService,
               private mqttIrService: MqttIrService) {
@@ -132,10 +135,13 @@ export class AcAutoModeComponent {
     this.mqttIrService.pullAcAutoModeConfig(deviceId).pipe(
       timeout(this.PULL_CONFIG_TIMEOUT),
       first(),
-      filter((message: IMqttMessage) => {
+      map((message: IMqttMessage) => {
         const payload = JSON.parse(message.payload.toString());
-        return Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD);
-      }),
+        if (Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD)) {
+          return message;
+        }
+        throw throwError(() => new Error("Payload do not contain auto config field"));
+      })
     ).subscribe({
       next: (message: IMqttMessage) => {
         this.irDeviceId.set(deviceId);
@@ -148,7 +154,7 @@ export class AcAutoModeComponent {
         this.mode = "config";
         this.loadingConfig = false;
         console.error(err);
-      },
+      }
     });
   }
 
@@ -226,24 +232,10 @@ export class AcAutoModeComponent {
     }
   }
 
-  private getContentError(control: AbstractControl, errorType: string): string | null {
-    if (control.errors) {
-      return null;
-    }
-
-    switch (errorType) {
-      case "maxActions": {
-        const maxActionsError = control.getError("maxActions");
-        return `Maximum ${maxActionsError.max} actions allowed. Currently selected: ${maxActionsError.actual}.`;
-      }
-      case "notIrSignalPresent": {
-        return "One or more actions do not contain a valid IR signal.";
-      }
-      default: {
-        return null;
-      }
-    }
-
+  protected toggleAutoMode() {
+    this.mqttIrService.setAutoMode(this.irDeviceId()!, this.autoModeEnabled())
+      .subscribe((enabled: boolean) => {
+        this.autoModeEnabled.set(enabled);
+      });
   }
-
 }

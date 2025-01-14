@@ -4,7 +4,7 @@
     @case ("config") {
       <div class="flex-horizontal full-width wrap">
         <div class="flex-vertical high-container">
-          <div class="flex-horizontal full-width metric-group">
+          <div class="flex-horizontal  metric-group">
             <app-room-metric sensorName="Hermetic"
                              metricName="hermetic"
                              [deviceId]="this.hermeticitySensorId"/>
@@ -58,8 +58,13 @@
             Update Config
           </button>
         </div>
-        <div class="flex-vertical control">
-          <button mat-flat-button>ON</button>
+        <div class="control">
+          <button mat-flat-button
+                  color="primary"
+                  [disabled]="!this.isConfigValid()"
+                  (click)="this.toggleAutoMode()">
+            {{this.autoModeEnabled() ? "Off" : "On"}}
+          </button>
         </div>
 
       </div>
