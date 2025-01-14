@@ -4,7 +4,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
 import {StringModalComponent} from "../base/string-modal/string-modal.component";
-import {concatMap, Observable, Subject, takeUntil} from "rxjs";
+import {concatMap, Observable, shareReplay, Subject, takeUntil} from "rxjs";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
 import {IMqttMessage} from "ngx-mqtt";
 import {Metric} from "../../types/metric";
@@ -60,24 +60,10 @@ export class RoomMetricComponent implements OnDestroy {
       this.destroy$.next();
     }
 
-    dialogRef.afterClosed()
-      .pipe(
-        concatMap((deviceId) => {
-          if (deviceId) {
-            this.deviceId.set(deviceId);
-            return this.mqttWrapper.topic(`${deviceId}/${this.METRIC_DATA_TOPIC}`);
-          }
-          throw new Error("Cancel device ID update");
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (message: IMqttMessage) => {
-          this.metricValue.set(this.extractMetricValue(message));
-        },
-        error: (error) => console.error(`Error updating device info:`, error),
-      });
-
+    dialogRef.afterClosed().subscribe({
+      next: (deviceId: string) => this.deviceId.set(deviceId),
+      error: (error) => console.error(`Error updating device info:`, error),
+    });
   }
 
   private extractMetricValue(message: IMqttMessage): string | undefined {
@@ -96,8 +82,20 @@ export class RoomMetricComponent implements OnDestroy {
   }
 
   private subscribeToDevice(deviceId: string): void {
-    this.mqttWrapper
-      .topic(`${deviceId}/${this.METRIC_DATA_TOPIC}`)
+    const topic = `${deviceId}/${this.METRIC_DATA_TOPIC}`;
+    if (!RoomMetricComponent.subscriptions.has(topic)) {
+      const topicObservable = this.mqttWrapper.topic(topic).pipe(shareReplay(1));
+      RoomMetricComponent.subscriptions.set(topic, topicObservable);
+      topicObservable.subscribe({
+        next: (message: IMqttMessage) => {
+          console.log(`Message received on topic: ${topic}: ${message.payload}`);
+        },
+        error: (error) => console.error(`Error with topic subscription:`, error),
+      });
+    }
+
+    const sharedSubscription = RoomMetricComponent.subscriptions.get(topic);
+    sharedSubscription!
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (message: IMqttMessage) => {
@@ -105,7 +103,6 @@ export class RoomMetricComponent implements OnDestroy {
         },
         error: (error) => console.error(`Error with topic subscription:`, error),
       });
-
   }
 
   ngOnDestroy(): void {
