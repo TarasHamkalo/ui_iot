@@ -15,9 +15,8 @@ import {
 } from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {first, map, switchMap, takeWhile, tap, throwError, timeout, timer} from "rxjs";
+import {switchMap, takeWhile, tap, timer} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {IMqttMessage} from "ngx-mqtt";
 import {AcAutoModeConfig} from "../../types/ac-auto-mode-config";
 import {ActionGroup} from "../../types/action-group";
 import {DecimalPipe, NgIf} from "@angular/common";
@@ -226,6 +225,6 @@ export class AcAutoModeComponent {
 
   protected toggleAutoMode() {
     this.mqttIrService.setAutoMode(this.irDeviceId()!, !this.autoModeEnabled())
-      .subscribe((enabled: boolean) => this.autoModeEnabled.set(enabled));
+      .subscribe(this.autoModeEnabled.set);
   }
 }

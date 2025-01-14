@@ -25,7 +25,7 @@ export class MqttIrService {
     setConfigCmd: (acAutoModeConfig: AcAutoModeConfig) => JSON.stringify({
       cmd: "set",
       args: {
-        type: "ac_auto_mode_config",
+        type: this.AC_AUTO_CONfIG_FIELD,
         value: acAutoModeConfig,
       }
     }),
