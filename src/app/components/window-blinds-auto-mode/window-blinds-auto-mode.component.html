@@ -4,6 +4,15 @@
     @case ("config") {
       <div class="flex-horizontal full-width wrap">
         <div class="flex-vertical high-container">
+          <div class="flex-horizontal full-width">
+            <button mat-icon-button
+                    aria-label="Disconnect from auto mode device"
+                    matTooltip="Disconnect from auto mode device"
+                    (click)="this.blindsControllerId.set(undefined)"
+            >
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+          </div>
           <div class="flex-horizontal  metric-group">
             <app-room-metric metricName="light"
                              sensorName="Daylight"

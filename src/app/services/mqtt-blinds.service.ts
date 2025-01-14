@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 import {AcAutoModeConfig} from "../types/ac-auto-mode-config";
 import {WindowBlindsAutoModeConfig} from "../types/window-blinds-auto-mode-config";
 import {first, map, Observable, throwError, timeout} from "rxjs";
@@ -40,7 +40,8 @@ export class MqttBlindsService {
 
   public readonly PULL_CONFIG_TIMEOUT = 3_000;
 
-  constructor(private mqttWrapper: MqttWrapperService) { }
+  constructor(private mqttWrapper: MqttWrapperService) {
+  }
 
   public publishWindowBlindsAutoModeConfig(deviceId: string, config: WindowBlindsAutoModeConfig): void {
     this.mqttWrapper.publish(
@@ -49,7 +50,7 @@ export class MqttBlindsService {
   }
 
   public pullWindowBlindsAutoModeConfig(deviceId: string): Observable<WindowBlindsAutoModeConfig> {
-    return this.mqttWrapper.topic(this.TOPICS.config(deviceId))
+    return this.mqttWrapper.topic(this.TOPICS.config(deviceId), true)
       .pipe(
         timeout(this.PULL_CONFIG_TIMEOUT),
         first(),
@@ -75,7 +76,7 @@ export class MqttBlindsService {
   }
 
   public isAutoModeEnabled(deviceId: string) {
-    return this.mqttWrapper.topic(this.TOPICS.status(deviceId)).pipe(
+    return this.mqttWrapper.topic(this.TOPICS.status(deviceId), true).pipe(
       first(),
       map((message: IMqttMessage) => {
         console.log(message.payload.toString());

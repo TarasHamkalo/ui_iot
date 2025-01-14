@@ -23,7 +23,6 @@ export class MqttWrapperService {
     if (this.isConnected()) {
       return;
     }
-
     try {
       this.mqttService.connect();
     } catch (error) {
@@ -45,8 +44,13 @@ export class MqttWrapperService {
     this.mqttService.unsafePublish(this.withBaseTopic(topic), message, {qos: 1, retain: true});
   }
 
-  public topic(topic: string): Observable<IMqttMessage> {
+  public topic(topic: string, retained: boolean): Observable<IMqttMessage> {
     console.log(this.withBaseTopic(topic));
+
+    if (retained) {
+      return this.mqttService.observeRetained(this.withBaseTopic(topic));
+    }
+
     return this.mqttService.observe(this.withBaseTopic(topic));
   }
 

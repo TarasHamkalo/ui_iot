@@ -1,7 +1,7 @@
-import {Component, signal} from "@angular/core";
+import {Component, effect, signal} from "@angular/core";
 import {SurfaceComponent} from "../base/surface/surface.component";
 import {RoomMetricComponent} from "../room-metric/room-metric.component";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatError, MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {RoomControlContextService} from "../../context/room-control-context.service";
@@ -22,6 +22,8 @@ import {ActionGroup} from "../../types/action-group";
 import {DecimalPipe, NgIf} from "@angular/common";
 import {MqttAction} from "../../types/mqtt-action";
 import {PersistentSignal} from "../../types/persistent-signal";
+import {MatIcon} from "@angular/material/icon";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: "app-ac-auto-mode",
@@ -40,6 +42,9 @@ import {PersistentSignal} from "../../types/persistent-signal";
     DecimalPipe,
     NgIf,
     MatError,
+    MatIconButton,
+    MatIcon,
+    MatTooltip,
 
   ],
   templateUrl: "./ac-auto-mode.component.html",
@@ -83,6 +88,13 @@ export class AcAutoModeComponent {
 
   constructor(protected roomControlContext: RoomControlContextService,
               protected mqttIrService: MqttIrService) {
+    effect(() => {
+      if (this.irDeviceId() !== undefined) {
+        this.mode = "config";
+      } else {
+        this.mode = "init";
+      }
+    });
   }
 
   protected uploadConfiguration() {
@@ -135,12 +147,10 @@ export class AcAutoModeComponent {
         tap({
           next: () => {
             this.loadingConfig = false;
-            this.mode = "config";
             this.irDeviceId.set(deviceId);
           },
           error: () => {
             this.loadingConfig = false;
-            this.mode = "config";
             this.irDeviceId.set(deviceId);
           }
         }),

@@ -58,11 +58,11 @@ export class MqttIrService {
 
   public record(deviceId: string): Observable<IMqttMessage> {
     this.mqttWrapper.publish(this.IR_TOPICS.cmd(deviceId), this.IR_PAYLOADS.recordCmd);
-    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId));
+    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId), true);
   }
 
   public capture(deviceId: string): Observable<IMqttMessage> {
-    return this.mqttWrapper.topic(this.IR_TOPICS.data(deviceId));
+    return this.mqttWrapper.topic(this.IR_TOPICS.data(deviceId), true);
   }
 
   public stopRecording(deviceId: string): void {
@@ -76,7 +76,7 @@ export class MqttIrService {
   }
 
   public pullAcAutoModeConfig(deviceId: string): Observable<Partial<AcAutoModeConfig>> {
-    return this.mqttWrapper.topic(this.IR_TOPICS.config(deviceId))
+    return this.mqttWrapper.topic(this.IR_TOPICS.config(deviceId), true)
       .pipe(
         timeout(this.PULL_CONFIG_TIMEOUT),
         first(),
@@ -108,7 +108,7 @@ export class MqttIrService {
   }
 
   public isAutoModeEnabled(deviceId: string) {
-    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId)).pipe(
+    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId), true).pipe(
       first(),
       map((message: IMqttMessage) => {
         console.log(message.payload.toString());

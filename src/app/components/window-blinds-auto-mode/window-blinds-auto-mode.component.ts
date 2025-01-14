@@ -1,14 +1,17 @@
-import {Component, signal, WritableSignal} from "@angular/core";
+import {Component, effect, signal, WritableSignal} from "@angular/core";
 import {SurfaceComponent} from "../base/surface/surface.component";
 import {RoomMetricComponent} from "../room-metric/room-metric.component";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {switchMap, tap} from "rxjs";
+import {first, Subject, switchMap, takeUntil, tap, timer} from "rxjs";
 import {WindowBlindsAutoModeConfig} from "../../types/window-blinds-auto-mode-config";
 import {MqttBlindsService} from "../../services/mqtt-blinds.service";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatIcon} from "@angular/material/icon";
+import {MqttService} from "ngx-mqtt";
 
 @Component({
   selector: "app-window-blinds-auto-mode",
@@ -19,7 +22,10 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     MatFormField,
     MatInput,
     MatProgressSpinner,
-    MatLabel
+    MatLabel,
+    MatIconButton,
+    MatTooltip,
+    MatIcon
   ],
   templateUrl: "./window-blinds-auto-mode.component.html",
   styleUrl: "./window-blinds-auto-mode.component.css"
@@ -36,7 +42,19 @@ export class WindowBlindsAutoModeComponent {
 
   protected autoModeEnabled = signal(false);
 
-  constructor(protected mqttBlindsService: MqttBlindsService) {
+  constructor(protected mqttBlindsService: MqttBlindsService,
+              protected mqttService: MqttService,
+  ) {
+    effect(() => {
+      if (this.blindsControllerId() !== undefined) {
+        this.mode = "config";
+      } else {
+        this.blindsMotorId.set(undefined);
+        this.mode = "init";
+        timer(1500, 0).pipe(first()).subscribe(() => {
+        });
+      }
+    });
   }
 
   protected toggleAutoMode() {
@@ -64,7 +82,7 @@ export class WindowBlindsAutoModeComponent {
           this.blindsMotorId.set(config.blinds_motor_id);
           console.log("setting config", config, " device id is ", deviceId);
           return this.mqttBlindsService.isAutoModeEnabled(this.blindsControllerId()!);
-        })
+        }),
       ).subscribe(this.autoModeEnabled.set);
 
   }

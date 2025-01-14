@@ -4,7 +4,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
 import {StringModalComponent} from "../base/string-modal/string-modal.component";
-import {concatMap, Observable, shareReplay, Subject, takeUntil} from "rxjs";
+import {concatMap, first, Observable, shareReplay, Subject, takeUntil} from "rxjs";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
 import {IMqttMessage} from "ngx-mqtt";
 import {Metric} from "../../types/metric";
@@ -31,17 +31,17 @@ export class RoomMetricComponent implements OnDestroy {
 
   protected metricValue = signal<string | undefined>(undefined);
 
-  private static subscriptions = new Map<string, Observable<IMqttMessage>>();
-
   private dialog = inject(MatDialog);
 
   private destroy$ = new Subject<void>();
 
   constructor(private mqttWrapper: MqttWrapperService) {
     effect(() => {
-      console.log(this.deviceId());
+      console.log("Sending destroy");
       if (this.deviceId() !== undefined) {
         this.subscribeToDevice(this.deviceId()!);
+      } else {
+        this.destroy$.next();
       }
     });
   }
@@ -61,7 +61,11 @@ export class RoomMetricComponent implements OnDestroy {
     }
 
     dialogRef.afterClosed().subscribe({
-      next: (deviceId: string) => this.deviceId.set(deviceId),
+      next: (deviceId: string) => {
+        if (deviceId !== undefined) {
+          this.deviceId.set(deviceId);
+        }
+      },
       error: (error) => console.error(`Error updating device info:`, error),
     });
   }
@@ -83,20 +87,8 @@ export class RoomMetricComponent implements OnDestroy {
 
   private subscribeToDevice(deviceId: string): void {
     const topic = `${deviceId}/${this.METRIC_DATA_TOPIC}`;
-    if (!RoomMetricComponent.subscriptions.has(topic)) {
-      const topicObservable = this.mqttWrapper.topic(topic).pipe(shareReplay(1));
-      RoomMetricComponent.subscriptions.set(topic, topicObservable);
-      topicObservable.subscribe({
-        next: (message: IMqttMessage) => {
-          console.log(`Message received on topic: ${topic}: ${message.payload}`);
-        },
-        error: (error) => console.error(`Error with topic subscription:`, error),
-      });
-    }
-
-    const sharedSubscription = RoomMetricComponent.subscriptions.get(topic);
-    sharedSubscription!
-      .pipe(takeUntil(this.destroy$))
+    this.mqttWrapper.topic(topic, true)
+      .pipe(first())
       .subscribe({
         next: (message: IMqttMessage) => {
           this.metricValue.set(this.extractMetricValue(message));
