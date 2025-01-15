@@ -12,18 +12,15 @@ export class MqttBlindsService {
 
   public readonly TOPICS = {
     cmd: (deviceId: string) => `${deviceId}/cmd`,
+    set: (deviceId: string) => `${deviceId}/set`,
     data: (deviceId: string) => `${deviceId}/data`,
     status: (deviceId: string) => `${deviceId}/status`,
     config: (deviceId: string) => `${deviceId}/status`,
   };
 
   public readonly PAYLOADS = {
-    setConfigCmd: (config: WindowBlindsAutoModeConfig) => JSON.stringify({
-      cmd: "set",
-      args: {
-        type: this.AUTO_CONfIG_FIELD,
-        value: config,
-      }
+    setConfig: (config: WindowBlindsAutoModeConfig) => JSON.stringify({
+      window_blinds_auto_mode_config: config,
     }),
 
     setAutoModeCmd: (enabled: boolean) => JSON.stringify({
@@ -45,15 +42,15 @@ export class MqttBlindsService {
 
   public publishWindowBlindsAutoModeConfig(deviceId: string, config: WindowBlindsAutoModeConfig): void {
     this.mqttWrapper.publish(
-      this.TOPICS.cmd(deviceId), this.PAYLOADS.setConfigCmd(config)
+      this.TOPICS.set(deviceId), this.PAYLOADS.setConfig(config)
     );
   }
 
   public pullWindowBlindsAutoModeConfig(deviceId: string): Observable<WindowBlindsAutoModeConfig> {
     return this.mqttWrapper.topic(this.TOPICS.config(deviceId), true)
       .pipe(
-        timeout(this.PULL_CONFIG_TIMEOUT),
         first(),
+        timeout(this.PULL_CONFIG_TIMEOUT),
         map((message: IMqttMessage) => {
           const payload = JSON.parse(message.payload.toString());
           if (Object.hasOwn(payload, this.AUTO_CONfIG_FIELD)) {
@@ -71,13 +68,10 @@ export class MqttBlindsService {
       this.TOPICS.cmd(deviceId),
       this.PAYLOADS.setAutoModeCmd(enabled)
     );
-
-    return this.isAutoModeEnabled(deviceId);
   }
 
   public isAutoModeEnabled(deviceId: string) {
     return this.mqttWrapper.topic(this.TOPICS.status(deviceId), true).pipe(
-      first(),
       map((message: IMqttMessage) => {
         console.log(message.payload.toString());
         const payload = JSON.parse(message.payload.toString());
@@ -90,4 +84,5 @@ export class MqttBlindsService {
       map(status => status === this.AUTO_MODE_STATUS)
     );
   }
+
 }

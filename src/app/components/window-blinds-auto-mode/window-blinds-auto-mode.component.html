@@ -38,7 +38,7 @@
                   color="primary"
                   [disabled]="!this.blindsMotorId()"
                   (click)="this.toggleAutoMode()">
-            @if (this.autoModeEnabled()) {
+            @if (!this.autoModeEnabled()) {
               ON
             } @else {
               OFF

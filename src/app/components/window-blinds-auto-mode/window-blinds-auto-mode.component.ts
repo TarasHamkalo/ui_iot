@@ -1,4 +1,4 @@
-import {Component, effect, signal, WritableSignal} from "@angular/core";
+import {Component, effect, OnDestroy, signal, WritableSignal} from "@angular/core";
 import {SurfaceComponent} from "../base/surface/surface.component";
 import {RoomMetricComponent} from "../room-metric/room-metric.component";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -30,7 +30,7 @@ import {MqttService} from "ngx-mqtt";
   templateUrl: "./window-blinds-auto-mode.component.html",
   styleUrl: "./window-blinds-auto-mode.component.css"
 })
-export class WindowBlindsAutoModeComponent {
+export class WindowBlindsAutoModeComponent implements OnDestroy {
 
   protected mode: "init" | "config" = "init";
 
@@ -42,24 +42,22 @@ export class WindowBlindsAutoModeComponent {
 
   protected autoModeEnabled = signal(false);
 
-  constructor(protected mqttBlindsService: MqttBlindsService,
-              protected mqttService: MqttService,
-  ) {
+  protected destroy$ = new Subject<void>();
+
+  constructor(protected mqttBlindsService: MqttBlindsService) {
     effect(() => {
       if (this.blindsControllerId() !== undefined) {
         this.mode = "config";
       } else {
         this.blindsMotorId.set(undefined);
         this.mode = "init";
-        timer(1500, 0).pipe(first()).subscribe(() => {
-        });
+        this.destroy$.next();
       }
     });
   }
 
   protected toggleAutoMode() {
-    this.mqttBlindsService.setAutoMode(this.blindsControllerId()!, !this.autoModeEnabled())
-      .subscribe(this.autoModeEnabled.set);
+    this.mqttBlindsService.setAutoMode(this.blindsControllerId()!, !this.autoModeEnabled());
   }
 
   protected connectToControllerDevice(deviceId: string) {
@@ -81,7 +79,7 @@ export class WindowBlindsAutoModeComponent {
         switchMap((config: WindowBlindsAutoModeConfig) => {
           this.blindsMotorId.set(config.blinds_motor_id);
           console.log("setting config", config, " device id is ", deviceId);
-          return this.mqttBlindsService.isAutoModeEnabled(this.blindsControllerId()!);
+          return this.mqttBlindsService.isAutoModeEnabled(this.blindsControllerId()!).pipe(takeUntil(this.destroy$));
         }),
       ).subscribe(this.autoModeEnabled.set);
 
@@ -96,5 +94,10 @@ export class WindowBlindsAutoModeComponent {
         }
       );
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
