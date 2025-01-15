@@ -79,7 +79,8 @@ export class WindowBlindsAutoModeComponent implements OnDestroy {
         switchMap((config: WindowBlindsAutoModeConfig) => {
           this.blindsMotorId.set(config.blinds_motor_id);
           console.log("setting config", config, " device id is ", deviceId);
-          return this.mqttBlindsService.isAutoModeEnabled(this.blindsControllerId()!).pipe(takeUntil(this.destroy$));
+          return this.mqttBlindsService.isAutoModeEnabled(this.blindsControllerId()!)
+            .pipe(takeUntil(this.destroy$));
         }),
       ).subscribe(this.autoModeEnabled.set);
 
@@ -90,7 +91,7 @@ export class WindowBlindsAutoModeComponent implements OnDestroy {
       this.mqttBlindsService.publishWindowBlindsAutoModeConfig(
         this.blindsControllerId()!,
         {
-          blinds_motor_id: this.blindsControllerId()!,
+          blinds_motor_id: this.blindsMotorId()!,
         }
       );
     }
