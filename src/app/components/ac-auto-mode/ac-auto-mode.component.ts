@@ -1,4 +1,4 @@
-import {Component, effect, signal} from "@angular/core";
+import {Component, effect, OnDestroy, signal} from "@angular/core";
 import {SurfaceComponent} from "../base/surface/surface.component";
 import {RoomMetricComponent} from "../room-metric/room-metric.component";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -15,7 +15,7 @@ import {
 } from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MqttIrService} from "../../services/mqtt-ir.service";
-import {switchMap, takeWhile, tap, timer} from "rxjs";
+import {first, Subject, switchMap, takeUntil, takeWhile, tap, timer} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {AcAutoModeConfig} from "../../types/ac-auto-mode-config";
 import {ActionGroup} from "../../types/action-group";
@@ -24,6 +24,7 @@ import {MqttAction} from "../../types/mqtt-action";
 import {PersistentSignal} from "../../types/persistent-signal";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
+import {MqttService} from "ngx-mqtt";
 
 @Component({
   selector: "app-ac-auto-mode",
@@ -50,7 +51,7 @@ import {MatTooltip} from "@angular/material/tooltip";
   templateUrl: "./ac-auto-mode.component.html",
   styleUrl: "./ac-auto-mode.component.scss"
 })
-export class AcAutoModeComponent {
+export class AcAutoModeComponent implements OnDestroy {
 
   public readonly MAX_ACTIONS_ALLOWED = 5;
 
@@ -86,6 +87,8 @@ export class AcAutoModeComponent {
 
   protected autoModeEnabled = signal(false);
 
+  protected destroy$ = new Subject<void>();
+
   constructor(protected roomControlContext: RoomControlContextService,
               protected mqttIrService: MqttIrService) {
     effect(() => {
@@ -93,6 +96,7 @@ export class AcAutoModeComponent {
         this.mode = "config";
       } else {
         this.mode = "init";
+        this.destroy$.next();
       }
     });
   }
@@ -125,8 +129,6 @@ export class AcAutoModeComponent {
           );
         }
       });
-
-      this.mqttIrService.isAutoModeEnabled(this.irDeviceId()!).subscribe(this.autoModeEnabled.set);
     }
   }
 
@@ -157,10 +159,12 @@ export class AcAutoModeComponent {
         switchMap((config: Partial<AcAutoModeConfig>) => {
           this.setAcAutoConfig(config);
           console.log("setting config", config, " device id is ", deviceId);
-          return this.mqttIrService.isAutoModeEnabled(this.irDeviceId()!);
-        })
-      ).subscribe(this.autoModeEnabled.set);
+          return this.mqttIrService.isAutoModeEnabled(this.irDeviceId()!).pipe(takeUntil(this.destroy$));
+        }),
 
+      ).subscribe((value) => {
+        this.autoModeEnabled.set(value);
+      });
   }
 
   public setAcAutoConfig(config: Partial<AcAutoModeConfig>) {
@@ -176,7 +180,6 @@ export class AcAutoModeComponent {
     this.onGroupFormControl.setValue(onGroup ?? null);
     this.offGroupFormControl.setValue(offGroup ?? null);
   }
-
 
   protected maxActionsValidator(max: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -234,7 +237,13 @@ export class AcAutoModeComponent {
   }
 
   protected toggleAutoMode() {
-    this.mqttIrService.setAutoMode(this.irDeviceId()!, !this.autoModeEnabled())
-      .subscribe(this.autoModeEnabled.set);
+    this.mqttIrService.setAutoMode(this.irDeviceId()!, !this.autoModeEnabled());
+      // .pipe(first())
+      // .subscribe();
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

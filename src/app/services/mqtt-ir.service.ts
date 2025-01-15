@@ -12,6 +12,7 @@ export class MqttIrService {
 
   public readonly IR_TOPICS = {
     cmd: (deviceId: string) => `${deviceId}/cmd`,
+    set: (deviceId: string) => `${deviceId}/set`,
     data: (deviceId: string) => `${deviceId}/data`,
     status: (deviceId: string) => `${deviceId}/status`,
     config: (deviceId: string) => `${deviceId}/status`,
@@ -23,11 +24,7 @@ export class MqttIrService {
     stopRecordingCmd: JSON.stringify({cmd: "standby"}),
 
     setConfigCmd: (acAutoModeConfig: AcAutoModeConfig) => JSON.stringify({
-      cmd: "set",
-      args: {
-        type: this.AC_AUTO_CONfIG_FIELD,
-        value: acAutoModeConfig,
-      }
+        ac_auto_mode_config: acAutoModeConfig,
     }),
 
     persistSignalsCmd: (groupName: string, signals: PersistentSignal[]) => JSON.stringify({
@@ -70,16 +67,18 @@ export class MqttIrService {
   }
 
   public publishAcAutoModeConfig(deviceId: string, acAutoModeConfig: AcAutoModeConfig): void {
+    console.log("Config is ", acAutoModeConfig);
+
     this.mqttWrapper.publish(
-      this.IR_TOPICS.cmd(deviceId), this.IR_PAYLOADS.setConfigCmd(acAutoModeConfig)
+      this.IR_TOPICS.set(deviceId), this.IR_PAYLOADS.setConfigCmd(acAutoModeConfig)
     );
   }
 
   public pullAcAutoModeConfig(deviceId: string): Observable<Partial<AcAutoModeConfig>> {
     return this.mqttWrapper.topic(this.IR_TOPICS.config(deviceId), true)
       .pipe(
-        timeout(this.PULL_CONFIG_TIMEOUT),
         first(),
+        timeout(this.PULL_CONFIG_TIMEOUT),
         map((message: IMqttMessage) => {
           const payload = JSON.parse(message.payload.toString());
           if (Object.hasOwn(payload, this.AC_AUTO_CONfIG_FIELD)) {
@@ -104,12 +103,10 @@ export class MqttIrService {
       this.IR_PAYLOADS.setAutoModeCmd(enabled)
     );
 
-    return this.isAutoModeEnabled(deviceId);
   }
 
   public isAutoModeEnabled(deviceId: string) {
     return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId), true).pipe(
-      first(),
       map((message: IMqttMessage) => {
         console.log(message.payload.toString());
         const payload = JSON.parse(message.payload.toString());
@@ -119,7 +116,9 @@ export class MqttIrService {
 
         return null;
       }),
-      map(status => status === this.AUTO_MODE_STATUS)
+      map(status => {
+        return status === this.AUTO_MODE_STATUS;
+      })
     );
   }
 }

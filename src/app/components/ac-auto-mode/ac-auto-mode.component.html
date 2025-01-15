@@ -73,7 +73,7 @@
                   color="primary"
                   [disabled]="!this.isConfigValid()"
                   (click)="this.toggleAutoMode()">
-            @if (this.autoModeEnabled()) {
+            @if (!this.autoModeEnabled()) {
               ON
             } @else {
               OFF
