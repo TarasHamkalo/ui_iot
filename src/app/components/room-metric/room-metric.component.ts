@@ -37,7 +37,6 @@ export class RoomMetricComponent implements OnDestroy {
 
   constructor(private mqttWrapper: MqttWrapperService) {
     effect(() => {
-      console.log("Sending destroy");
       if (this.deviceId() !== undefined) {
         this.subscribeToDevice(this.deviceId()!);
       } else {
@@ -63,6 +62,7 @@ export class RoomMetricComponent implements OnDestroy {
     dialogRef.afterClosed().subscribe({
       next: (deviceId: string) => {
         if (deviceId !== undefined) {
+          console.log("Setting metric device id", deviceId);
           this.deviceId.set(deviceId);
         }
       },
@@ -76,9 +76,11 @@ export class RoomMetricComponent implements OnDestroy {
       if (!Array.isArray(payload)) {
         return undefined;
       }
-
-      const metric = (payload as Metric[]).find(m => m.name === this.metricName);
-      console.log(`metric ${metric?.value}`);
+      console.log(payload);
+      const metric = (payload as Metric[]).filter(m => m.name === this.metricName)
+        .sort((m1, m2) => m2.dt - m1.dt)
+        .at(0);
+      console.log(`metric ${metric?.dt}`);
       return metric?.value;
     } catch {
       return undefined;
