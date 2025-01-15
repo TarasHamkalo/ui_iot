@@ -4,7 +4,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
 import {StringModalComponent} from "../base/string-modal/string-modal.component";
-import {concatMap, first, Observable, shareReplay, Subject, takeUntil} from "rxjs";
+import {first, Subject} from "rxjs";
 import {MqttWrapperService} from "../../services/mqtt-wrapper.service";
 import {IMqttMessage} from "ngx-mqtt";
 import {Metric} from "../../types/metric";
