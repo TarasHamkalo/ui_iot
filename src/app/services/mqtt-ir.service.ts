@@ -19,9 +19,9 @@ export class MqttIrService {
   };
 
   public readonly IR_PAYLOADS = {
-    recordCmd: JSON.stringify({cmd: "record"}),
+    recordCmd: JSON.stringify({cmd: "record", args: {}}),
 
-    stopRecordingCmd: JSON.stringify({cmd: "standby"}),
+    stopRecordingCmd: JSON.stringify({cmd: "standby", args: {}}),
 
     setConfigCmd: (acAutoModeConfig: AcAutoModeConfig) => JSON.stringify({
         ac_auto_mode_config: acAutoModeConfig,
@@ -55,11 +55,11 @@ export class MqttIrService {
 
   public record(deviceId: string): Observable<IMqttMessage> {
     this.mqttWrapper.publish(this.IR_TOPICS.cmd(deviceId), this.IR_PAYLOADS.recordCmd);
-    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId), true);
+    return this.mqttWrapper.topic(this.IR_TOPICS.status(deviceId), false);
   }
 
   public capture(deviceId: string): Observable<IMqttMessage> {
-    return this.mqttWrapper.topic(this.IR_TOPICS.data(deviceId), true);
+    return this.mqttWrapper.topic(this.IR_TOPICS.data(deviceId), false);
   }
 
   public stopRecording(deviceId: string): void {

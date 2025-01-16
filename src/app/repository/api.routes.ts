@@ -14,14 +14,16 @@ export const API_ROUTES = {
 
   actionGroups: {
     getAll: () => `${API_ROUTES.baseUrl}/groups`,
+    get: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
     add: () => `${API_ROUTES.baseUrl}/groups`,
-    update: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
+    update: () => `${API_ROUTES.baseUrl}/groups`,
     delete: (id: string) => `${API_ROUTES.baseUrl}/groups/${id}`,
   },
 
   schedules: {
     add: () => `${API_ROUTES.baseUrl}/schedules`,
     getAll: () => `${API_ROUTES.baseUrl}/schedules`,
+    get: (id: string) => `${API_ROUTES.baseUrl}/schedules/${id}`,
     delete: (id: string) => `${API_ROUTES.baseUrl}/schedules/${id}`,
   }
 

@@ -13,15 +13,16 @@ export class MqttActionRepositoryService {
   constructor(private http: HttpClient) {
   }
 
-  public getAllByRoomId(room: Room): Observable<MqttAction[]> {
-    const options = {params: new HttpParams().set("roomId", room.id)};
-    return this.http.get<MqttAction[]>(API_ROUTES.mqttActions.getAll(), options);
-  }
+  // public getAllByRoomId(room: Room): Observable<MqttAction[]> {
+  //   const options = {params: new HttpParams().set("roomId", room.id)};
+  //   return this.http.get<MqttAction[]>(API_ROUTES.mqttActions.getAll(), options);
+  // }
 
   public add(action: Partial<MqttAction>): Observable<MqttAction> {
-    console.log(action);
-    console.log(API_ROUTES.mqttActions.add());
     return this.http.post<MqttAction>(API_ROUTES.mqttActions.add(), action);
   }
 
+  public getAll(): Observable<MqttAction[]>  {
+    return this.http.get<MqttAction[]>(API_ROUTES.mqttActions.add());
+  }
 }

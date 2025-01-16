@@ -115,7 +115,9 @@ export class ActionRegistrationComponent {
       next: (message: IMqttMessage) => {
         const payload = {
           cmd: this.IR_SEND_COMMAND,
+          args: {
           ...JSON.parse(message.payload.toString())
+          }
         };
         console.log(payload);
         this.payloadForm.controls["mqttPayload"].setValue(JSON.stringify(payload));
@@ -141,13 +143,15 @@ export class ActionRegistrationComponent {
 
       this.mqttActionRepository.add({
         // id: Date.now(),
-        roomId: this.roomControlContext.getControlledRoom()().id,
+        // roomId: this.roomControlContext.getControlledRoom()().id,
         displayName: this.basicInfoForm.controls["actionName"].value,
         mqttTopic: this.basicInfoForm.controls["mqttTopic"].value,
         mqttRetain: this.basicInfoForm.controls["mqttRetain"].value,
         mqttPayload: JSON.stringify(payload)
       }).subscribe({
-        next: (action: MqttAction) => this.roomControlContext.addActionToContext(action),
+        next: (action: MqttAction) => {
+          this.roomControlContext.addActionToContext(action);
+        },
         error: console.error
       });
       this.resetStepper(stepper);

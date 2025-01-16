@@ -78,8 +78,8 @@ export class HomePageComponent implements OnInit {
         this.rooms = rooms;
         this.loading = false;
       },
-      error: () => {
-        console.error("Failed to fetch rooms");
+      error: (error) => {
+        console.error("Failed to fetch rooms", error);
         this.loading = false;
       },
     });

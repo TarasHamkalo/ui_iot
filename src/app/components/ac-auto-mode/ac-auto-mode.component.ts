@@ -215,7 +215,7 @@ export class AcAutoModeComponent implements OnDestroy {
       ?.map(action => this.roomControlContext.getRoomActions()().find(s => s.id === action.actionId))
       .filter(action => this.isValidMqttAction(action))
       .map((action, i) => {
-        const data = JSON.parse(action!.mqttPayload.toString()).data;
+        const data = JSON.parse(action!.mqttPayload.toString()).args.data;
         return {
           id: i,
           data: data
@@ -230,7 +230,7 @@ export class AcAutoModeComponent implements OnDestroy {
 
     try {
       const parsedPayload = JSON.parse(action.mqttPayload);
-      return Array.isArray(parsedPayload.data);
+      return Array.isArray(parsedPayload?.args?.data);
     } catch {
       return false;
     }

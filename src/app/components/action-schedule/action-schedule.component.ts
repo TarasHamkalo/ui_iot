@@ -67,7 +67,7 @@ import {MatIcon} from "@angular/material/icon";
 })
 export class ActionScheduleComponent {
 
-  protected days: string[] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  protected days: string[] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   protected scheduleFormGroup: FormGroup;
 
@@ -114,7 +114,7 @@ export class ActionScheduleComponent {
 
   protected deleteSchedule(schedule: Schedule) {
     this.schedulesRepositoryService.delete(schedule.id).subscribe({
-      next: (schedule: Schedule) => this.roomControlContextService.deleteSchedule(schedule),
+      next: (scheduleId: string) => this.roomControlContextService.deleteSchedule(scheduleId),
       error: console.error
     });
   }

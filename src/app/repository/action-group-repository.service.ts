@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {Room} from "../types/room";
 import {Observable} from "rxjs";
 import {ActionGroup} from "../types/action-group";
@@ -14,8 +14,7 @@ export class ActionGroupRepositoryService {
   }
 
   public getAllByRoomId(room: Room): Observable<ActionGroup[]> {
-    const options = {params: new HttpParams().set("roomId", room.id)};
-    return this.http.get<ActionGroup[]>(API_ROUTES.actionGroups.getAll(), options);
+    return this.http.get<ActionGroup[]>(API_ROUTES.actionGroups.get(room.id));
   }
 
   public addGroup(group: Partial<ActionGroup>): Observable<ActionGroup> {
@@ -23,10 +22,10 @@ export class ActionGroupRepositoryService {
   }
 
   public updateGroup(group: ActionGroup): Observable<ActionGroup> {
-    return this.http.put<ActionGroup>(API_ROUTES.actionGroups.update(group.id), group);
+    return this.http.put<ActionGroup>(API_ROUTES.actionGroups.update(), group);
   }
 
-  public deleteGroup(group: ActionGroup): Observable<ActionGroup> {
-    return this.http.delete<ActionGroup>(API_ROUTES.actionGroups.delete(group.id));
+  public deleteGroup(group: ActionGroup): Observable<string> {
+    return this.http.delete<string>(API_ROUTES.actionGroups.delete(group.id));
   }
 }

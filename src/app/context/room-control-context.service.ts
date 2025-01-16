@@ -31,8 +31,9 @@ export class RoomControlContextService {
   }
 
   public prepareRoom(): Observable<boolean> {
+    // actions: this.actionRepository.getAllByRoomId(this.controlledRoom() as Room),
     forkJoin({
-      actions: this.actionRepository.getAllByRoomId(this.controlledRoom() as Room),
+      actions: this.actionRepository.getAll(),
       groups: this.actionGroupsRepository.getAllByRoomId(this.controlledRoom() as Room),
       schedules: this.schedulesRepository.getAllByRoomId(this.controlledRoom() as Room)
     }).subscribe({
@@ -43,7 +44,8 @@ export class RoomControlContextService {
         this.roomSchedules.set(data.schedules);
         this.preparedSubject.next(true);
       },
-      error: () => {
+      error: (error) => {
+        console.log(error);
         this.preparedSubject.next(false);
       },
     });
@@ -67,8 +69,8 @@ export class RoomControlContextService {
     this.roomActionGroups.update(groups => groups.map(source => source.id === target.id ? target: source));
   }
 
-  public deleteGroup(target: ActionGroup) {
-    this.roomActionGroups.update(groups => groups.filter(source => source.id !== target.id));
+  public deleteGroup(targetId: string) {
+    this.roomActionGroups.update(groups => groups.filter(source => source.id !== targetId));
   }
 
   public getRoomActionGroups() {
@@ -82,8 +84,8 @@ export class RoomControlContextService {
     this.roomSchedules.update(schedules => [...schedules, schedule]);
   }
 
-  public deleteSchedule(target: Schedule) {
-    this.roomSchedules.update(schedules => schedules.filter(source => source.id !== target.id));
+  public deleteSchedule(targetId: string) {
+    this.roomSchedules.update(schedules => schedules.filter(source => source.id !== targetId));
   }
 
   public getRoomSchedules() {

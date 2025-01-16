@@ -64,6 +64,7 @@ export class ActionGroupComponent implements OnInit {
     (agg, cur) => agg + (cur.activated ? 1 : 0),
     0
   ));
+
   constructor(private roomControlContext: RoomControlContextService,
               private actionGroupRepository: ActionGroupRepositoryService) {
 
@@ -134,7 +135,7 @@ export class ActionGroupComponent implements OnInit {
 
   protected deleteGroup() {
     this.actionGroupRepository.deleteGroup(this.actionGroup).subscribe({
-      next: (group) => this.roomControlContext.deleteGroup(group),
+      next: (groupId) => this.roomControlContext.deleteGroup(groupId),
     });
   }
 
